@@ -17,10 +17,11 @@ export default
   },
   computed: {
     ...mapState([
-      'page',
-  ])},
-  beforeUpdate() {
-    console.log("beforeUpdate", this.page);
+      'page'
+    ])
+  },
+  beforeUpdate () {
+    console.log('beforeUpdate', this.page)
   }
 }
 </script>

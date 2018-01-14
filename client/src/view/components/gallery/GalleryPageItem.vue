@@ -7,10 +7,10 @@ export default
 {
   name: 'GalleryPageItem',
   props: [
-    "url"
+    'url'
   ],
-  beforeUpdate() {
-    console.log(url);
+  beforeUpdate () {
+    console.log(this.url)
   }
 }
 </script>

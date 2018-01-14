@@ -25,18 +25,18 @@ export default
   name: 'GalleryNavigation',
   computed: {
     ...mapState([
-      'index',
+      'index'
     ]),
     ...mapGetters({
-        isPrevPossible: IS_NAVIGATE_POSSIBLE_PREV,
-        isNextPossible: IS_NAVIGATE_POSSIBLE_NEXT
+      isPrevPossible: IS_NAVIGATE_POSSIBLE_PREV,
+      isNextPossible: IS_NAVIGATE_POSSIBLE_NEXT
     })
   },
   methods: {
     ...mapActions({
-        navigate: GalleryAction.NAVIGATE
+      navigate: GalleryAction.NAVIGATE
     })
-  },
+  }
 }
 </script>
 

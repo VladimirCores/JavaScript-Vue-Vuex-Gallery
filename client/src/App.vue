@@ -17,12 +17,6 @@ import Spinner from '@/view/components/common/loading/Spinner.vue'
 import GalleryStore from '@/model/stores/GalleryStore'
 import GalleryAction from '@/consts/actions/GalleryAction'
 
-import {
-    mapState,
-    mapActions,
-    mapMutations
-} from 'vuex';
-
 export default {
   name: 'App',
   components: {
@@ -30,11 +24,10 @@ export default {
     Spinner
   },
   store: GalleryStore, // <-------------- STORE MAPPING
-  created()
-  {
-    GalleryStore.dispatch(GalleryAction.GET_GALLERY_PAGE).then(success => this.ready = success)
+  created () {
+    GalleryStore.dispatch(GalleryAction.GET_GALLERY_PAGE).then(success => { this.ready = success })
   },
-  data() {
+  data () {
     return {
       ready: false
     }
