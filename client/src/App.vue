@@ -2,35 +2,28 @@
   <div id="app">
     <header>
       <span>Gallery PWA</span>
+      <span><router-link v-if="$route.path!=='/'" to="/" exact>Home</router-link></span>
+      <span><router-link v-if="$route.path==='/'" to="/gallery">Gallery</router-link></span>
     </header>
     <main>
-      <Gallery v-if="ready" keep-alive/>
-      <Spinner v-else></Spinner>
+      <transition name="slide">
+        <router-view></router-view>
+      </transition>
     </main>
   </div>
 </template>
 
 <script>
-import Gallery from '@/view/components/Gallery.vue'
-import Spinner from '@/view/components/common/loading/Spinner.vue'
 
-import GalleryStore from '@/model/stores/GalleryStore'
-import GalleryAction from '@/consts/actions/GalleryAction'
+import ApplicationStore from '@/model/stores/ApplicationStore'
 
 export default {
   name: 'App',
   components: {
-    Gallery,
-    Spinner
+
   },
-  store: GalleryStore, // <-------------- STORE MAPPING
+  store: ApplicationStore, // <-------------- STORE MAPPING
   created () {
-    GalleryStore.dispatch(GalleryAction.GET_GALLERY_PAGE).then(success => { this.ready = success })
-  },
-  data () {
-    return {
-      ready: false
-    }
   }
 }
 </script>
@@ -61,7 +54,8 @@ export default {
   }
 
   header span {
-    display: block;
+    display: inline-block;
+    color: white;
     position: relative;
     font-size: 20px;
     line-height: 1;
@@ -69,5 +63,12 @@ export default {
     font-weight: 400;
     box-sizing: border-box;
     padding-top: 16px;
+    margin-right: 1em;
   }
+
+  header span a {
+    color: white;
+    text-decoration: none;
+  }
+
 </style>

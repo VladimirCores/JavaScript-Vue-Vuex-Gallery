@@ -8,17 +8,21 @@
 
 <script>
 
-import {
-  mapState,
-  mapGetters,
-  mapActions
-} from 'vuex'
+import { createNamespacedHelpers } from 'vuex'
 
 import GalleryAction from '@/consts/actions/GalleryAction'
+import { GALLERY_STORE_NAME } from '@/consts/StoreNames'
+
 import {
   IS_NAVIGATE_POSSIBLE_PREV,
   IS_NAVIGATE_POSSIBLE_NEXT
 } from '@/consts/getters/GalleryGetter'
+
+const {
+  mapState,
+  mapGetters,
+  mapActions
+} = createNamespacedHelpers(GALLERY_STORE_NAME)
 
 export default
 {

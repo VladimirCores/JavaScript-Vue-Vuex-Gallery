@@ -2,7 +2,7 @@ export default class GalleryVO {
   constructor (index, quantity) {
     this.index = index
     this.quantity = quantity
-    this.page = null
+    this.view = null
   }
 
   static default () {

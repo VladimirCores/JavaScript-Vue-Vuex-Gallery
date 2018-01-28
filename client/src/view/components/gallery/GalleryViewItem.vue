@@ -1,11 +1,11 @@
 <template>
-    <img class="gallery-page-item" :src="url"/>
+    <img class="gallery-view-item" :src="url"/>
 </template>
 
 <script>
 export default
 {
-  name: 'GalleryPageItem',
+  name: 'GalleryViewItem',
   props: [
     'url'
   ],
@@ -16,7 +16,7 @@ export default
 </script>
 
 <style>
-.gallery-page-item {
+.gallery-view-item {
   margin: 0.25em;
 }
 </style>

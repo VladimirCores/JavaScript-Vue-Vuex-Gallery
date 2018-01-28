@@ -1,28 +1,28 @@
 <template>
   <div class="gallery">
     <GalleryNavigation/>
-    <GalleryPage/>
+    <GalleryView/>
   </div>
 </template>
+
 <script>
 
 import { mapState } from 'vuex'
-import GalleryPage from '@/view/components/gallery/GalleryPage'
+
+import { GALLERY_STORE_NAME } from '@/consts/StoreNames'
+import GalleryView from '@/view/components/gallery/GalleryView'
 import GalleryNavigation from '@/view/components/gallery/GalleryNavigation'
 
 export default {
   name: 'Gallery',
   components: {
-    GalleryPage,
+    GalleryView,
     GalleryNavigation
   },
   computed: {
     ...mapState([
-    ])},
-  data () {
-    return {
-
-    }
+      GALLERY_STORE_NAME
+    ])
   }
 }
 </script>
