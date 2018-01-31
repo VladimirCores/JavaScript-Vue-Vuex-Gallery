@@ -1,4 +1,4 @@
-# invisart
+# Vue-Gallery
 
 > A Vue.js project
 
