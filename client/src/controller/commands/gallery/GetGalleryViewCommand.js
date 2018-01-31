@@ -2,8 +2,8 @@ import axios from 'axios'
 
 import RESOLUTIONS from '@/consts/Resolutions'
 
-import GalleryViewVO from '@/vos/gallery/GalleryViewVO'
-import GalleryViewItemVO from '@/vos/gallery/GalleryViewItemVO'
+import GalleryViewVO from '@/model/vos/gallery/GalleryViewVO'
+import GalleryViewItemVO from '@/model/vos/gallery/GalleryViewItemVO'
 
 class GetGalleryViewCommand {
   execute (index, quantity) {

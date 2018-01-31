@@ -2,13 +2,11 @@
   <div id="app">
     <header>
       <span>Gallery PWA</span>
-      <span><router-link v-if="$route.path!=='/'" to="/" exact>Home</router-link></span>
-      <span><router-link v-if="$route.path==='/'" to="/gallery">Gallery</router-link></span>
+      <span v-if="$route.path!=='/'"><router-link to="/" exact>Home</router-link></span>
+      <span v-if="$route.path==='/'"><router-link to="/gallery">Gallery</router-link></span>
     </header>
     <main>
-      <transition name="slide">
-        <router-view></router-view>
-      </transition>
+      <router-view></router-view>
     </main>
   </div>
 </template>

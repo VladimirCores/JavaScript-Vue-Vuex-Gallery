@@ -1,29 +1,41 @@
 <template>
-  <div class="index">
-    <ServerDataForm :serverData="serverData"/>
-  </div>
+  <form>
+    <div>Access Key:</div>
+    <input type="text" v-model="access_key"><br>
+    <div>Token:</div>
+    <input type="text" v-model="access_token"><br>
+    <div>UserID:</div>
+    <input type="text" v-model="user_id"><br>
+    <button type="button" @click="accept(access_key, access_token, user_id)">Accept</button>
+  </form>
 </template>
 
 <script>
 
-import { mapState, mapActions } from 'vuex'
-import ServerDataForm from '@/view/components/index/ServerDataForm'
-// import ApplicationAction from '@/consts/actions/ApplicationAction'
+import { mapActions } from 'vuex'
+import ApplicationAction from '@/consts/actions/ApplicationAction'
 
 export default {
-  name: 'IndexPage',
-  components: {
-    ServerDataForm
-  },
-  computed: {
-    ...mapState({
-      serverData: state => state.server || {}
-    })
+  name: 'ServerDataForm',
+  props: {
+    serverData: {
+      type: Object,
+      required: true
+    }
   },
   methods: {
     ...mapActions({
+      accept: ApplicationAction.ACCEPT_SERVER_DATA
     })
+  },
+  data: function () {
+    return {
+      access_key: this.serverData.accessKey,
+      access_token: this.serverData.accessToken,
+      user_id: this.serverData.userID
+    }
   }
+
 }
 </script>
 

@@ -1,4 +1,4 @@
-import GalleryVO from '@/vos/gallery/GalleryVO'
+import GalleryVO from '@/model/vos/gallery/GalleryVO'
 
 import GalleryAction from '@/consts/actions/GalleryAction'
 import GalleryGetter from '@/consts/getters/GalleryGetter'

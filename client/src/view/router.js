@@ -3,8 +3,6 @@ import Router from 'vue-router'
 
 import IndexPage from '@/view/pages/IndexPage'
 
-const GalleryPage = () => import('@/view/pages/GalleryPage')
-
 Vue.use(Router)
 
 const router = new Router({
@@ -17,7 +15,7 @@ const router = new Router({
     {
       path: '/gallery',
       name: 'GalleryPage',
-      component: GalleryPage,
+      component: () => import('@/view/pages/GalleryPage'),
       beforeEnter (to, from, next) {
         next()
       },
