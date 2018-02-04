@@ -1,7 +1,7 @@
 export default class GalleryPageItemVO {
-  constructor (name, uri, link) {
+  constructor (name, uri, imageUrl) {
     this.name = name
     this.uri = uri
-    this.link = link
+    this.imageUrl = imageUrl
   }
 }

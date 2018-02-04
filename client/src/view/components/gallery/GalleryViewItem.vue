@@ -1,5 +1,5 @@
 <template>
-    <img class="gallery-view-item" :src="url"/>
+    <img class="gallery-view-item" :src="imageUrl"/>
 </template>
 
 <script>
@@ -7,7 +7,7 @@ export default
 {
   name: 'GalleryViewItem',
   props: [
-    'url'
+    'imageUrl'
   ],
   beforeUpdate () {
     console.log(this.url)

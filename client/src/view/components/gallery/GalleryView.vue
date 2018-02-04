@@ -1,6 +1,10 @@
 <template>
   <div class="gallery-view" v-if="ready">
-    <GalleryViewItem v-for="item in items" url="item.link" key="item.uri"/>
+    <GalleryViewItem
+      v-for="item in items"
+      :imageUrl="item.imageUrl"
+      :key="item.uri"
+    />
   </div>
 </template>
 
@@ -20,7 +24,7 @@ export default
   },
   computed: {
     ...mapState({
-      ready: state => (state.view != null),
+      ready: state => state.view != null,
       items: state => state.view.items
     })
   }

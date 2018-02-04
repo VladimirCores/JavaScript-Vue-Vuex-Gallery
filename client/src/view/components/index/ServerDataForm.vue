@@ -1,13 +1,14 @@
 <template>
-  <form>
-    <div>Access Key:</div>
-    <input type="text" v-model="access_key"><br>
-    <div>Token:</div>
-    <input type="text" v-model="access_token"><br>
-    <div>UserID:</div>
-    <input type="text" v-model="user_id"><br>
-    <button type="button" @click="accept(access_key, access_token, user_id)">Accept</button>
-  </form>
+  <div class="settings">
+    <form>
+      <a class="close" @click="onClose"/>
+      <div>UserID:</div>
+      <input type="text" v-model="userID"><br>
+      <div>Token:</div>
+      <input type="text" v-model="accessToken"><br>
+      <button type="button" @click="onAccept" :disabled="!validated || !changed">Accept</button>
+    </form>
+  </div>
 </template>
 
 <script>
@@ -18,58 +19,124 @@ import ApplicationAction from '@/consts/actions/ApplicationAction'
 export default {
   name: 'ServerDataForm',
   props: {
-    serverData: {
-      type: Object,
+    user_id: {
+      type: String,
+      required: true
+    },
+    access_token: {
+      type: String,
       required: true
     }
   },
   methods: {
     ...mapActions({
-      accept: ApplicationAction.ACCEPT_SERVER_DATA
+      onClose: function () {
+        this.$emit('close')
+      },
+      onAccept: function () {
+        this.validated = false
+        this.$store.dispatch(ApplicationAction.CHANGE_SERVER_DATA,
+          {...this.$data}
+        ).then((result) => {
+          this.validated = true
+        })
+      }
     })
+  },
+  computed: {
+    changed: function () {
+      return this.user_id !== this.userID ||
+        this.access_token !== this.accessToken
+    }
   },
   data: function () {
     return {
-      access_key: this.serverData.accessKey,
-      access_token: this.serverData.accessToken,
-      user_id: this.serverData.userID
+      userID: this.user_id,
+      accessToken: this.access_token,
+      validated: true
     }
   }
-
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-  form {
-    text-align: center;
-    margin: 0 auto;
-    padding: 0 1rem;
-    max-width: 300px;
-    background: #fcfcfc;
-    border: 1px solid #f1f1f1;
-    div {
-      font-size: 0.88rem;
-      color: #666;
-      text-align: left;
-      margin-top: 1rem;
-      padding-left: 0.21rem;
-    }
-    input {
-      width: 100%;
-      height: 1.618rem;
-      font-size: 1rem;
-      text-indent: 0.34rem;
-      border-radius: 0.25rem;
-      border: 1px solid #dddddd;
-      outline: none;
-    }
 
-    button {
-      margin: 1rem 0 0.75rem 0;
+  .settings
+  {
+    background-color: rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position:fixed;
+    height: 100%;
+    width: 100%;
+    top: 0;
+
+    form {
+      position: relative;
+      text-align: center;
+      align-self: center;
+      align-content: center;
+      margin: auto;
+      padding: 0.5rem 1rem;
+      min-width: 360px;
+      max-width: 360px;
+      background: #fcfcfc;
+      border: 1px solid #f1f1f1;
       border-radius: 5px;
-      height: 1.618rem;
-      font-weight: bold;
+
+      div {
+        font-size: 0.88rem;
+        color: #666;
+        text-align: left;
+        margin-top: 1rem;
+        padding-left: 0.21rem;
+      }
+
+      input {
+        width: 100%;
+        height: 1.618rem;
+        font-size: 1rem;
+        text-indent: 0.34rem;
+        border-radius: 0.25rem;
+        border: 1px solid #dddddd;
+        outline: none;
+      }
+
+      button {
+        margin: 1rem 0 0.5rem 0;
+        width: 34%;
+        border-radius: 5px;
+        height: 1.618rem;
+        font-weight: bold;
+      }
+
+      .close {
+        position: absolute;
+        right: 8px;
+        top: 8px;
+        width: 15px;
+        height: 15px;
+        opacity: 0.2;
+        &:hover {
+          opacity: 1;
+        }
+      }
+      .close:before, .close:after {
+        position: absolute;
+        content: ' ';
+        height: 15px;
+        width: 2px;
+        background-color: #555;
+      }
+      .close:before {
+        transform: rotate(45deg);
+      }
+      .close:after {
+        transform: rotate(-45deg);
+      }
     }
   }
 </style>

@@ -8,14 +8,14 @@ import GetGalleryViewCommand from '@/controller/commands/gallery/GetGalleryViewC
 import NavigateGalleryViewCommand from '@/controller/commands/gallery/NavigateGalleryViewCommand'
 
 export default {
-  state: GalleryVO.default(),
+  state: new GalleryVO(1, 5),
   actions: {
     [GalleryAction.GET_GALLERY_VIEW] (store) {
       let galleryVO = store.state
       // console.log('> GalleryStore > GalleryAction.GET_GALLERY_VIEW > getGalleryData', galleryVO)
       return GetGalleryViewCommand.execute(galleryVO.index, galleryVO.quantity)
         .then(result => {
-          // console.log('> GalleryStore > GetGalleryDataCommand > result:', result)
+          console.log('> GalleryStore > GetGalleryDataCommand > result:', result)
           store.commit(GalleryMutation.UPDATE_GALLERY_VIEW, result)
           return true
         }, (error) => {

@@ -4,8 +4,4 @@ export default class GalleryVO {
     this.quantity = quantity
     this.view = null
   }
-
-  static default () {
-    return new GalleryVO(1, 5)
-  }
 }

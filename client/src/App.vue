@@ -14,6 +14,7 @@
 <script>
 
 import ApplicationStore from '@/model/stores/ApplicationStore'
+import { mapState } from 'vuex'
 
 export default {
   name: 'App',
@@ -21,12 +22,15 @@ export default {
 
   },
   store: ApplicationStore, // <-------------- STORE MAPPING
+  computed: {
+    ...mapState(['server'])
+  },
   created () {
   }
 }
 </script>
 
-<style scoped>
+<style>
   body {
     margin: 0;
   }

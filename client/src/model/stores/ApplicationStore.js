@@ -1,13 +1,16 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-// import ServerVO from '@/model/vos/ServerVO'
+import ServerVO from '@/model/vos/ServerVO'
 import ApplicationVO from '@/model/vos/ApplicationVO'
 import ApplicationAction from '@/consts/actions/ApplicationAction'
-// import Database from '@/model/Database'
-// Database.init('application')// .debug()
-// const db = Database.getInstance()
-// db.get('server')
+import ApplicationGetter from '@/consts/getters/ApplicationGetter'
+import {
+  SERVER_DATA_UPDATE,
+  SERVER_DATA_SETUP
+} from '@/consts/mutations/ServerDataMutation'
+
+import Database from '@/model/Database'
 
 Vue.use(Vuex)
 
@@ -15,8 +18,18 @@ export default new Vuex.Store({
   state: new ApplicationVO(),
   strict: true,
   actions: {
-    [ApplicationAction.ACCEPT_SERVER_DATA] (store, key, token, user) {
-      console.log(key, token, user)
+    [ApplicationAction.CHANGE_SERVER_DATA] (store, payload) {
+      return Database.getInstance()
+        .put(Object.assign({...store.state.server}, payload))
+        .then(doc => doc.ok && !store.commit(SERVER_DATA_UPDATE, Object.assign(payload, {_rev: doc.rev})))
+        .catch(error => !error)
     }
+  },
+  getter: {
+    [ApplicationGetter.GET_SERVER]: (state) => state.server
+  },
+  mutations: {
+    [SERVER_DATA_UPDATE]: (state, payload) => { state.server = Object.assign(state.server, payload) },
+    [SERVER_DATA_SETUP]: (state, payload) => { state.server = Object.assign(new ServerVO(), payload) }
   }
 })

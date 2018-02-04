@@ -11,7 +11,7 @@ class Database {
   }
   init (path) {
     console.log('> Database -> Init: ' + path)
-    this[_instance] = new PouchDB(path)
+    this[_instance] = new PouchDB(`http://localhost:5984/${path}`)
     return this
   }
   getInstance () { return this[_instance] }

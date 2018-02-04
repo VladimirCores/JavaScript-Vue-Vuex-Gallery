@@ -1,9 +1,9 @@
 export default class ServerVO {
-  constructor (obj) {
-    console.log(obj)
-    this.url = 'https://api.vimeo.com/users'
-    this.userID = null
-    this.accessKey = null
-    this.accessToken = null
+  constructor () {
+    this._id = 'server'
+    this._rev = ''
+    this.url = ''
+    this.userID = ''
+    this.accessToken = ''
   }
 }

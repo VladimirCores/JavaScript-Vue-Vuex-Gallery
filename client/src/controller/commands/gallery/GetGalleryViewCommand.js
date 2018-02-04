@@ -18,17 +18,13 @@ class GetGalleryViewCommand {
       .then(response => {
         console.log('> \t GetGalleryViewCommand > data', response.data)
         let inputData = response.data
-        let galleryItems = inputData.data.map((item) => {
-          // console.log('> GetGalleryViewCommand > item', item)
-          let link = item.pictures.sizes[RESOLUTIONS.R_200_150].link
-          return new GalleryViewItemVO(
-            item.name,
-            item.uri,
-            link
-          )
+        let resolution = RESOLUTIONS.R_200_150
+        let galleryItems = inputData.data.map((item, index) => {
+          // console.log('> GetGalleryViewCommand > item', index, item)
+          let imageUrl = item.pictures.sizes[resolution].link
+          return new GalleryViewItemVO(item.name, item.uri, imageUrl)
         })
         let pagesLimit = Math.ceil(inputData.total / quantity)
-        console.log(new GalleryViewVO(pagesLimit, galleryItems))
         return new GalleryViewVO(pagesLimit, galleryItems)
       })
       .catch(function (error) {
