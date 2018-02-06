@@ -1,14 +1,18 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+import UserVO from '@/model/vos/UserVO'
 import ServerVO from '@/model/vos/ServerVO'
 import ApplicationVO from '@/model/vos/ApplicationVO'
+
 import ApplicationAction from '@/consts/actions/ApplicationAction'
 import ApplicationGetter from '@/consts/getters/ApplicationGetter'
+
 import {
   SERVER_DATA_UPDATE,
-  SERVER_DATA_SETUP
-} from '@/consts/mutations/ServerDataMutation'
+  SERVER_DATA_SETUP,
+  USER_DATA_SETUP
+} from '@/consts/mutations/ApplicationMutation'
 
 import Database from '@/model/Database'
 
@@ -30,6 +34,7 @@ export default new Vuex.Store({
   },
   mutations: {
     [SERVER_DATA_UPDATE]: (state, payload) => { state.server = Object.assign(state.server, payload) },
-    [SERVER_DATA_SETUP]: (state, payload) => { state.server = Object.assign(new ServerVO(), payload) }
+    [SERVER_DATA_SETUP]: (state, payload) => { state.server = Object.assign(new ServerVO(), payload) },
+    [USER_DATA_SETUP]: (state, payload) => { state.user = Object.assign(new UserVO(), payload) }
   }
 })
