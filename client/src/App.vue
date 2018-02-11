@@ -1,36 +1,57 @@
 <template>
-  <div id="app">
-    <header>
-      <span>Gallery PWA</span>
-      <span v-if="$route.path!=='/'"><router-link to="/" exact>Home</router-link></span>
-      <span v-if="$route.path==='/'"><router-link to="/gallery">Gallery</router-link></span>
-    </header>
-    <main>
-      <router-view></router-view>
-    </main>
-  </div>
+  <transition name="fade" mode="out-in">
+    <div id="app" v-if="isReady" key="app">
+      <header>
+        <span>Gallery PWA</span>
+        <span v-if="$route.path!=='/'"><router-link to="/" exact>Home</router-link></span>
+        <span v-if="$route.path==='/' && user.isRegistered"><router-link to="/gallery">Gallery</router-link></span>
+        <span v-if="$route.path==='/' && !user.isRegistered"><router-link to="/entrance">Login</router-link></span>
+      </header>
+      <main>
+        <router-view></router-view>
+      </main>
+    </div>
+    <preloader v-else key="preloader"/>
+  </transition>
 </template>
 
 <script>
 
+import Preloader from '@/view/components/_common/loading/Preloader'
 import ApplicationStore from '@/model/stores/ApplicationStore'
+
 import { mapState } from 'vuex'
 
 export default {
   name: 'App',
   components: {
-
+    'preloader': Preloader
   },
-  store: ApplicationStore, // <-------------- STORE MAPPING
   computed: {
-    ...mapState(['server'])
+    ...mapState(['isReady', 'user'])
   },
   created () {
-  }
+    console.log('> App -> created: USER =', this.user)
+  },
+  beforeRouteUpdate (to, from, next) {
+    // react to route changes...
+    // don't forget to call next()
+    console.log('> App -> beforeRouteUpdate: from =', from)
+  },
+  store: ApplicationStore // <-------------- STORE MAPPING
 }
 </script>
 
-<style>
+<style lang="scss">
+
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity .3s ease;
+  }
+  .fade-enter, .fade-leave-to
+    /* .component-fade-leave-active below version 2.1.8 */ {
+    opacity: 0;
+  }
+
   body {
     margin: 0;
   }
@@ -40,6 +61,10 @@ export default {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #2c3e50;
+  }
+
+  .preparing {
+
   }
 
   main {

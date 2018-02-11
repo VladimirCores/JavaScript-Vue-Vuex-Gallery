@@ -5,10 +5,10 @@ import RESOLUTIONS from '@/consts/Resolutions'
 import GalleryViewVO from '@/model/vos/gallery/GalleryViewVO'
 import GalleryViewItemVO from '@/model/vos/gallery/GalleryViewItemVO'
 
-class GetGalleryViewCommand {
+class GetDataGalleryCommand {
   execute (index, quantity) {
     // https://developer.vimeo.com/api/authentication
-    console.log('> \t GetGalleryViewCommand > index | quantity =', index, quantity)
+    console.log('> \t GetDataGalleryCommand > index | quantity =', index, quantity)
     return axios.get('https://api.vimeo.com/users/invisart/likes', {
       params: {
         page: index,
@@ -16,11 +16,11 @@ class GetGalleryViewCommand {
         access_token: '3dc0bb25295c04f03bf331e5227f963f'
       }})
       .then(response => {
-        console.log('> \t GetGalleryViewCommand > data', response.data)
+        console.log('> \t GetDataGalleryCommand > data', response.data)
         let inputData = response.data
         let resolution = RESOLUTIONS.R_200_150
         let galleryItems = inputData.data.map((item, index) => {
-          // console.log('> GetGalleryViewCommand > item', index, item)
+          // console.log('> GetDataGalleryCommand > item', index, item)
           let imageUrl = item.pictures.sizes[resolution].link
           return new GalleryViewItemVO(item.name, item.uri, imageUrl)
         })
@@ -33,6 +33,6 @@ class GetGalleryViewCommand {
   }
 }
 
-const SINGLETON = new GetGalleryViewCommand()
+const SINGLETON = new GetDataGalleryCommand()
 
 export default SINGLETON

@@ -22,6 +22,17 @@ const router = new Router({
       beforeRouteLeave (to, from, next) {
         next()
       }
+    },
+    {
+      path: '/entrance',
+      name: 'EntrancePage',
+      component: () => import('@/view/pages/EntrancePage'),
+      beforeEnter (to, from, next) {
+        next()
+      },
+      beforeRouteLeave (to, from, next) {
+        next()
+      }
     }
   ],
   mode: 'history'

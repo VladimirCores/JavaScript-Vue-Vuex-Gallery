@@ -1,9 +1,9 @@
 export default class UserVO {
   constructor () {
-    this._id = ''
-    this._rev = ''
-    this.name = ''
-    this.surname = ''
+    this.uid = ''
+    this.lastName = ''
+    this.firstName = ''
+    this.email = ''
     this.token = ''
   }
 }

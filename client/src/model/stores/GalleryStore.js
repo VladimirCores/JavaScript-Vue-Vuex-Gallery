@@ -4,16 +4,18 @@ import GalleryAction from '@/consts/actions/GalleryAction'
 import GalleryGetter from '@/consts/getters/GalleryGetter'
 import GalleryMutation from '@/consts/mutations/GalleryMutation'
 
-import GetGalleryViewCommand from '@/controller/commands/gallery/GetGalleryViewCommand'
-import NavigateGalleryViewCommand from '@/controller/commands/gallery/NavigateGalleryViewCommand'
+import GetDataGalleryCommand from '@/controller/commands/gallery/GetDataGalleryCommand'
+import NavigateGalleryCommand from '@/controller/commands/gallery/NavigateGalleryCommand'
 
 export default {
   state: new GalleryVO(1, 5),
+  strict: true,
+  namespaced: true,
   actions: {
     [GalleryAction.GET_GALLERY_VIEW] (store) {
       let galleryVO = store.state
       // console.log('> GalleryStore > GalleryAction.GET_GALLERY_VIEW > getGalleryData', galleryVO)
-      return GetGalleryViewCommand.execute(galleryVO.index, galleryVO.quantity)
+      return GetDataGalleryCommand.execute(galleryVO.index, galleryVO.quantity)
         .then(result => {
           console.log('> GalleryStore > GetGalleryDataCommand > result:', result)
           store.commit(GalleryMutation.UPDATE_GALLERY_VIEW, result)
@@ -26,9 +28,9 @@ export default {
     [GalleryAction.NAVIGATE] (store, increment) {
       // console.log('> GalleryStore > GalleryAction.NAVIGATE > increment: ' + increment)
       let galleryVO = store.state
-      return NavigateGalleryViewCommand.execute(galleryVO.index, galleryVO.quantity, galleryVO.view.limit, increment)
+      return NavigateGalleryCommand.execute(galleryVO.index, galleryVO.quantity, galleryVO.view.limit, increment)
         .then(result => {
-          // console.log('> GalleryStore > NavigateGalleryViewCommand > result:', result)
+          // console.log('> GalleryStore > NavigateGalleryCommand > result:', result)
           let success = result != null
           if (success) {
             store.commit(GalleryMutation.UPDATE_GALLERY_VIEW, result)
@@ -36,7 +38,7 @@ export default {
           }
           return success
         }, (error) => {
-          console.error('> GalleryStore > NavigateGalleryViewCommand > error:', error)
+          console.error('> GalleryStore > NavigateGalleryCommand > error:', error)
           return false
         })
     }
@@ -48,6 +50,5 @@ export default {
   mutations: {
     [GalleryMutation.UPDATE_GALLERY_VIEW]: (state, payload) => { state.view = payload },
     [GalleryMutation.UPDATE_GALLERY_VIEW_INDEX]: (state, payload) => { state.index += payload }
-  },
-  namespaced: true
+  }
 }

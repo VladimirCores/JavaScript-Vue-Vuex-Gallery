@@ -1,59 +1,50 @@
-<template>
-  <div class="server-data" @click.prevent.self="onClose">
+<template lang="html">
+  <div class="signup">
     <form>
-      <a class="close" @click="onClose"/>
-      <div>UserID:</div>
-      <input type="text" v-model="userID"><br>
-      <div>Token:</div>
-      <input type="text" v-model="accessToken"><br>
-      <button type="button" @click="onAccept" :disabled="!validated || !changed">Accept</button>
+      <div>First Name:</div>
+      <input type="text" v-model="firstName"><br>
+      <div>Last Name:</div>
+      <input type="text" v-model="lastName"><br>
+      <div>Email:</div>
+      <input type="text" v-model="email"><br>
+      <div>Password:</div>
+      <input type="text" v-model="password"><br>
+      <div>Confirm Password:</div>
+      <input type="text" v-model="confirm"><br>
+      <button type="button" @click="onRegister" :disabled="!validated">Register</button>
     </form>
   </div>
 </template>
 
 <script>
 
-import { mapActions } from 'vuex'
-import ApplicationAction from '@/consts/actions/ApplicationAction'
+import UserAction from '@/consts/actions/UserAction'
+
+import { createNamespacedHelpers } from 'vuex'
+import { USER_STORE_NAME } from '@/consts/StoreNames'
+
+const { mapActions } = createNamespacedHelpers(USER_STORE_NAME)
 
 export default {
-  name: 'ServerDataForm',
-  props: {
-    user_id: {
-      type: String,
-      required: true
-    },
-    access_token: {
-      type: String,
-      required: true
-    }
-  },
+  name: 'Signup',
   methods: {
     ...mapActions({
-      changeServerData: ApplicationAction.CHANGE_SERVER_DATA
+      signupUser: UserAction.SIGN_UP
     }),
-    onClose () {
-      this.$emit('close')
-    },
-    onAccept () {
-      this.validated = false
-      this.changeServerData({...this.$data})
-        .then((result) => {
-          this.validated = true
-        })
+    onRegister () {
+      this.signupUser({...this.$data})
     }
   },
   computed: {
-    changed: function () {
-      return this.user_id !== this.userID ||
-        this.access_token !== this.accessToken
-    }
+    validated: function () { return this.firstName.length > 0 }
   },
   data: function () {
     return {
-      userID: this.user_id,
-      accessToken: this.access_token,
-      validated: true
+      firstName: 'name',
+      lastName: 'surname',
+      email: 'myname@gmail.com',
+      password: '123',
+      confirm: '123'
     }
   }
 }
@@ -62,9 +53,8 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 
-  .server-data
+  .signup
   {
-    background-color: rgba(0,0,0,0.3);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -73,6 +63,7 @@ export default {
     height: 100%;
     width: 100%;
     top: 0;
+    z-index: -1;
 
     form {
       position: relative;
@@ -81,11 +72,12 @@ export default {
       align-content: center;
       margin: auto;
       padding: 0.5rem 1rem;
-      min-width: 360px;
+      width: 100%;
       max-width: 360px;
       background: #fcfcfc;
       border: 1px solid #f1f1f1;
       border-radius: 5px;
+      box-sizing: border-box;
 
       div {
         font-size: 0.88rem;
@@ -113,6 +105,8 @@ export default {
         height: 1.618rem;
         font-weight: bold;
         user-select: none;
+        box-sizing: border-box;
+        min-width: 89px;
       }
 
       .close {

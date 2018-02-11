@@ -1,5 +1,5 @@
 <template>
-  <div class="index">
+  <div class="index-page">
     <div class="icon_settings" @click="openServerDataForm"/>
     <transition name="component-fade" mode="out-in">
       <component v-if="server" v-bind:is="serverDataForm"
@@ -20,7 +20,7 @@ const COMPONENT_SERVER_DATA_FORM = 'component-server-data-form'
 export default {
   name: 'IndexPage',
   components: {
-    [COMPONENT_SERVER_DATA_FORM]: () => import('@/view/components/index/ServerDataForm')
+    [COMPONENT_SERVER_DATA_FORM]: ''
   },
   computed: {
     ...mapState([
@@ -29,7 +29,7 @@ export default {
   },
   methods: {
     closeServerDataForm () { this.serverDataForm = '' },
-    openServerDataForm () { this.serverDataForm = COMPONENT_SERVER_DATA_FORM }
+    openServerDataForm () { this.serverDataForm = () => import('@/view/components/index/ServerDataForm') }
   },
   data () {
     return {

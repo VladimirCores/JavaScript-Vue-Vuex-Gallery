@@ -12,7 +12,7 @@ class Database {
     _remoteDB = new PouchDB(`http://localhost:5984/${path}`, {skip_setup: true})
     new PouchDB(`local_${path}`)
       .sync(_remoteDB, {live: true, retry: true})
-      // .on('error', console.log.bind(console))
+      .on('error', console.log.bind(console))
     return this
   }
   getInstance () { return _remoteDB }

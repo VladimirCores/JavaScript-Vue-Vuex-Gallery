@@ -6,6 +6,7 @@ import router from '@/view/router'
 
 import Database from '@/model/Database'
 import ApplicationMutations from '@/consts/mutations/ApplicationMutation'
+import ApplicationActions from '@/consts/actions/ApplicationAction'
 
 Vue.config.productionTip = false
 Database.init('application').production()
@@ -19,12 +20,18 @@ new Vue({
     let db = Database.getInstance()
     return Promise.all([
       db.getSession((err, response) => {
+        console.log('> Main -> beforeCreate: session =', response)
         if (err) {
           // network error
         } else if (!response.userCtx.name) {
           // nobody's logged in
         } else {
           // response.userCtx.name is the current user
+          return db.getUser(response.userCtx.name)
+            .then((doc) => {
+              console.log('> Main -> beforeCreate: user =', doc)
+              App.store.commit(ApplicationMutations.USER_DATA_SETUP, doc)
+            })
         }
       }),
       db.get('server', (error, doc) => {
@@ -33,7 +40,8 @@ new Vue({
         App.store.commit(ApplicationMutations.SERVER_DATA_SETUP, doc)
       })
     ]).then(function (values) {
-      console.log(values)
+      console.log('> Main -> Application Initialized', values)
+      App.store.dispatch(ApplicationActions.INITIALIZED)
     }).catch((error) => {
       console.log(error)
     })

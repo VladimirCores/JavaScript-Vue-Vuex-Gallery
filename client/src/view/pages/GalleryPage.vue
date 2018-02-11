@@ -36,7 +36,9 @@ export default {
   beforeDestroy () {
     this.$store.unregisterModule(GALLERY_STORE_NAME)
   },
-  created () { this.getGalleryView().then(success => { this.ready = success }) },
+  created () {
+    this.getGalleryView().then(success => { this.ready = success })
+  },
   data () {
     return {
       ready: false
