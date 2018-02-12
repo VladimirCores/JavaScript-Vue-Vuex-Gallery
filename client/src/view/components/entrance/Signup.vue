@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="signup">
+  <div class="signup" v-if="!isUserRegistered">
     <form>
       <div>First Name:</div>
       <input type="text" v-model="firstName"><br>
@@ -9,8 +9,6 @@
       <input type="text" v-model="email"><br>
       <div>Password:</div>
       <input type="text" v-model="password"><br>
-      <div>Confirm Password:</div>
-      <input type="text" v-model="confirm"><br>
       <button type="button" @click="onRegister" :disabled="!validated">Register</button>
     </form>
   </div>
@@ -22,29 +20,49 @@ import UserAction from '@/consts/actions/UserAction'
 
 import { createNamespacedHelpers } from 'vuex'
 import { USER_STORE_NAME } from '@/consts/StoreNames'
+import { IS_USER_REGISTERED } from '@/consts/getters/UserGetter'
+import PageNames from '@/consts/PageNames'
+import UserError from '@/consts/errors/UserError'
 
-const { mapActions } = createNamespacedHelpers(USER_STORE_NAME)
+const { mapActions, mapGetters } = createNamespacedHelpers(USER_STORE_NAME)
 
 export default {
   name: 'Signup',
   methods: {
-    ...mapActions({
-      signupUser: UserAction.SIGN_UP
-    }),
+    ...mapActions([ UserAction.SIGN_UP ]),
     onRegister () {
-      this.signupUser({...this.$data})
+      this[UserAction.SIGN_UP]({...this.$data})
+        .then(result => {
+          switch (result) {
+            case UserError.SIGN_UP_FAILED:
+              break
+            case UserError.SIGN_UP_RESPONSE:
+              break
+            default:
+              this.$router.authorized = true
+              this.$router.push({ name: PageNames.INDEX })
+          }
+        })
     }
   },
   computed: {
-    validated: function () { return this.firstName.length > 0 }
+    ...mapGetters({
+      'isUserRegistered': IS_USER_REGISTERED
+    }),
+    validated: function () {
+      return this.firstName.length > 0 &&
+        this.lastName.length > 0 &&
+        this.password.length > 0 &&
+        (this.email.length > 0 && this.email.indexOf('@') > 1)
+    }
   },
   data: function () {
+    var d = Date.now()
     return {
-      firstName: 'name',
-      lastName: 'surname',
-      email: 'myname@gmail.com',
-      password: '123',
-      confirm: '123'
+      firstName: 'name' + d,
+      lastName: 'surname' + d,
+      email: 'myname@gmail.com' + d,
+      password: '123'
     }
   }
 }

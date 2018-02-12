@@ -30,6 +30,7 @@ new Vue({
           return db.getUser(response.userCtx.name)
             .then((doc) => {
               console.log('> Main -> beforeCreate: user =', doc)
+              router.authorized = true
               App.store.commit(ApplicationMutations.USER_DATA_SETUP, doc)
             })
         }

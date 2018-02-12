@@ -7,11 +7,11 @@ class LoginUserCommand {
       .logIn(email, password)
       .then((response) => {
         // {"ok":true,"name":"david","roles":[]}
-        console.log('> \t LoginUserCommand > logIn: response =', response)
+        console.log('> LoginUserCommand > logIn: response =', response)
         return response.ok
       })
       .catch((error) => {
-        console.log('> \t LoginUserCommand > logIn: error =', error)
+        console.log('> LoginUserCommand > logIn: error =', error)
         if (error) {
           if (error.name === 'unauthorized' || error.name === 'forbidden') {
             // name or password incorrect

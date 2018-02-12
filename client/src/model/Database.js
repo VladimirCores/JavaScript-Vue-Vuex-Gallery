@@ -18,6 +18,20 @@ class Database {
   getInstance () { return _remoteDB }
   production () { PouchDB.debug.disable() }
   debug () { PouchDB.debug.enable('*') }
+  isAuthorized () {
+    return _remoteDB.getSession((err, response) => {
+      if (err) {
+        // network error
+        return null
+      } else if (!response.userCtx.name) {
+        // nobody's logged in
+        return null
+      } else {
+        // response.userCtx.name is the current user
+        return response.userCtx.name
+      }
+    })
+  }
 }
 
 const DB = new Database()

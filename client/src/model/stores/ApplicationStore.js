@@ -1,11 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import UserVO from '@/model/vos/UserVO'
 import ServerVO from '@/model/vos/ServerVO'
 import ApplicationVO from '@/model/vos/ApplicationVO'
 
 import UserStore from '@/model/stores/UserStore'
+import {
+  USER_STORE_NAME
+} from '@/consts/StoreNames'
 
 import ApplicationAction from '@/consts/actions/ApplicationAction'
 import ApplicationGetter from '@/consts/getters/ApplicationGetter'
@@ -26,7 +28,7 @@ export default new Vuex.Store({
   strict: true,
   namespaced: true,
   modules: {
-    user: UserStore
+    [USER_STORE_NAME]: UserStore
   },
   actions: {
     [ApplicationAction.CHANGE_SERVER_DATA] (store, payload) {
@@ -46,6 +48,6 @@ export default new Vuex.Store({
     [APPLICATION_IS_READY]: (state, payload) => { state.isReady = payload },
     [SERVER_DATA_UPDATE]: (state, payload) => { state.server = Object.assign(state.server, payload) },
     [SERVER_DATA_SETUP]: (state, payload) => { state.server = Object.assign(new ServerVO(), payload) },
-    [USER_DATA_SETUP]: (state, payload) => { state.user = Object.assign(new UserVO(), payload) }
+    [USER_DATA_SETUP]: (state, payload) => { for (let key in state.user) state.user[key] = payload[key] }
   }
 })
