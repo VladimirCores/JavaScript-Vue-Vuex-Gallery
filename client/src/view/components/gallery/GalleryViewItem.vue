@@ -15,7 +15,7 @@ export default
 }
 </script>
 
-<style>
+<style lang='scss'>
 .gallery-view-item {
   margin: 0.25em;
 }

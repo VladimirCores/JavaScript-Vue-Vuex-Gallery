@@ -1,14 +1,18 @@
 import Database from '@/model/Database'
 
 class LoginUserCommand {
-  execute (email, password) {
-    let db = Database.getInstance()
+  execute (name, password) {
+    console.log('> LoginUserCommand > name | password:', name + '|' + password)
+    let db = Database.getApplicationInstance()
     return db
-      .logIn(email, password)
+      .logIn(name, password)
       .then((response) => {
         // {"ok":true,"name":"david","roles":[]}
         console.log('> LoginUserCommand > logIn: response =', response)
-        return response.ok
+        return db.getUser(name).then((response) => {
+          console.log('> LoginUserCommand > getUser: response =', response)
+          return response
+        })
       })
       .catch((error) => {
         console.log('> LoginUserCommand > logIn: error =', error)

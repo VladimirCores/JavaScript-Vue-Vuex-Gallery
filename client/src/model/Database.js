@@ -4,33 +4,50 @@ PouchDB.plugin(PouchAuth)
 
 /* eslint no-new-symbol: 2 */
 /* eslint-env es6 */
-let _remoteDB = null
+let _applicationDB = null
+let _userDB = null
+
+const DB_URL = 'http://localhost:5984/'
+
+function _convertToHex (str) {
+  var hex = ''
+  for (var i = 0; i < str.length; i++) {
+    hex += '' + str.charCodeAt(i).toString(16)
+  }
+  return hex
+}
 
 class Database {
   init (path) {
     console.log('> Database -> Init: ' + path)
-    _remoteDB = new PouchDB(`http://localhost:5984/${path}`, {skip_setup: true})
+    _applicationDB = new PouchDB(`${DB_URL}${path}`, {skip_setup: true})
     new PouchDB(`local_${path}`)
-      .sync(_remoteDB, {live: true, retry: true})
+      .sync(_applicationDB, {live: true, retry: true})
       .on('error', console.log.bind(console))
     return this
   }
-  getInstance () { return _remoteDB }
+
+  getApplicationInstance () { return _applicationDB }
+  getUserInstance () { return _userDB }
   production () { PouchDB.debug.disable() }
   debug () { PouchDB.debug.enable('*') }
-  isAuthorized () {
-    return _remoteDB.getSession((err, response) => {
-      if (err) {
-        // network error
-        return null
-      } else if (!response.userCtx.name) {
-        // nobody's logged in
-        return null
-      } else {
-        // response.userCtx.name is the current user
-        return response.userCtx.name
-      }
+  configureForUser (username, password) {
+    console.log('> Database -> configureForUser: username = ' + username)
+    console.log('> Database -> configureForUser: password = ' + password)
+    _userDB = new PouchDB(`${DB_URL}/userdb-${_convertToHex(username)}`, {
+      auth: {
+        username: username,
+        password: password
+      },
+      skip_setup: true
     })
+  }
+  isAuthorized () {
+    return _applicationDB.getSession()
+      .then((response) => {
+        console.log('> Database -> getSession:', response)
+        return response ? response.userCtx.name : null // response.userCtx.name is the current user
+      })
   }
 }
 

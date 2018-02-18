@@ -11,7 +11,7 @@ Vue.use(VueRouter)
 const isAuthorized = function (next, redirect, reverse = false) {
   Database.isAuthorized()
     .then(user => {
-      console.log('> Router -> isAuthorized =', user != null)
+      console.log('> Router -> isAuthorized =', user)
       if (reverse ? user == null : user != null) next()
       else Router.replace({ name: redirect })
     })

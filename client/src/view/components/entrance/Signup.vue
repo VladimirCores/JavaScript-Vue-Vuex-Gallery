@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="signup" v-if="!isUserRegistered">
+  <div class="signup" v-if="!isUserLoggedIn">
     <form>
       <div>First Name:</div>
       <input type="text" v-model="firstName"><br>
@@ -16,22 +16,22 @@
 
 <script>
 
-import UserAction from '@/consts/actions/UserAction'
-
-import { createNamespacedHelpers } from 'vuex'
-import { USER_STORE_NAME } from '@/consts/StoreNames'
-import { IS_USER_REGISTERED } from '@/consts/getters/UserGetter'
 import PageNames from '@/consts/PageNames'
 import UserError from '@/consts/errors/UserError'
+import AuthDTO from '@/model/dtos/AuthDTO'
+import UserAction from '@/consts/actions/UserAction'
 
-const { mapActions, mapGetters } = createNamespacedHelpers(USER_STORE_NAME)
+import ApplicationAction from '@/consts/actions/ApplicationAction'
+import ApplicationGetter from '@/consts/getters/ApplicationGetter'
+
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'Signup',
   methods: {
-    ...mapActions([ UserAction.SIGN_UP ]),
+    ...mapActions({ signup: ApplicationAction.SETUP_USER }),
     onRegister () {
-      this[UserAction.SIGN_UP]({...this.$data})
+      this.signup(new AuthDTO(this.$data, UserAction.SIGNUP))
         .then(result => {
           switch (result) {
             case UserError.SIGN_UP_FAILED:
@@ -39,7 +39,6 @@ export default {
             case UserError.SIGN_UP_RESPONSE:
               break
             default:
-              this.$router.authorized = true
               this.$router.push({ name: PageNames.INDEX })
           }
         })
@@ -47,7 +46,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      'isUserRegistered': IS_USER_REGISTERED
+      'isUserLoggedIn': ApplicationGetter.USER_LOGGED_IN
     }),
     validated: function () {
       return this.firstName.length > 0 &&

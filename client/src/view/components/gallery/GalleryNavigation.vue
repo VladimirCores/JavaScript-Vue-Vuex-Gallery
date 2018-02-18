@@ -1,8 +1,16 @@
 <template>
   <div class="gallery-navigation">
-    <button v-if="isPrevPossible" @click="navigate(-1)">Prev</button>
+    <button v-if="isPrevPossible"
+      @click="onNavigateBack"
+      :disabled="locked">
+        Prev
+      </button>
     <span>{{index}}</span>
-    <button v-if="isNextPossible" @click="navigate(1)">Next</button>
+    <button v-if="isNextPossible"
+      @click="onNavigateNext"
+      :disabled="locked">
+        Next
+      </button>
   </div>
 </template>
 
@@ -10,7 +18,6 @@
 
 import { createNamespacedHelpers } from 'vuex'
 
-import GalleryAction from '@/consts/actions/GalleryAction'
 import { GALLERY_STORE_NAME } from '@/consts/StoreNames'
 
 import {
@@ -20,26 +27,30 @@ import {
 
 const {
   mapState,
-  mapGetters,
-  mapActions
+  mapGetters
 } = createNamespacedHelpers(GALLERY_STORE_NAME)
+
+const EVENT_NAVIGATE = 'navigate'
 
 export default
 {
   name: 'GalleryNavigation',
+  props: {
+    locked: {
+      type: Boolean,
+      required: true
+    }
+  },
   computed: {
-    ...mapState([
-      'index'
-    ]),
+    ...mapState(['index']),
     ...mapGetters({
       isPrevPossible: IS_NAVIGATE_POSSIBLE_PREV,
       isNextPossible: IS_NAVIGATE_POSSIBLE_NEXT
     })
   },
   methods: {
-    ...mapActions({
-      navigate: GalleryAction.NAVIGATE
-    })
+    onNavigateBack () { this.$emit(EVENT_NAVIGATE, -1) },
+    onNavigateNext () { this.$emit(EVENT_NAVIGATE, 1) }
   }
 }
 </script>

@@ -1,13 +1,6 @@
 <template>
   <div class="index-page">
-    <div class="icon_settings" @click="openServerDataForm"/>
-    <transition name="component-fade" mode="out-in">
-      <component v-if="server" v-bind:is="serverDataForm"
-        :user_id="server.userID"
-        :access_token="server.accessToken"
-        @close="closeServerDataForm">
-      </component>
-    </transition>
+
   </div>
 </template>
 
@@ -15,25 +8,17 @@
 
 import { mapState } from 'vuex'
 
-const COMPONENT_SERVER_DATA_FORM = 'component-server-data-form'
-
 export default {
   name: 'IndexPage',
-  components: {
-    [COMPONENT_SERVER_DATA_FORM]: ''
-  },
   computed: {
     ...mapState([
       'server'
     ])
   },
   methods: {
-    closeServerDataForm () { this.serverDataForm = '' },
-    openServerDataForm () { this.serverDataForm = () => import('@/view/components/index/ServerDataForm') }
   },
   data () {
     return {
-      serverDataForm: ''
     }
   }
 }
@@ -41,29 +26,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
-  .component-fade-enter-active, .component-fade-leave-active {
-    transition: opacity .3s ease;
-  }
-  .component-fade-enter, .component-fade-leave-to
-    /* .component-fade-leave-active below version 2.1.8 */ {
-    opacity: 0;
-  }
-
-  .icon_settings {
-    position: absolute;
-    right: 0;
-    margin-right: 1rem;
-    width: 25px;
-    height: 25px;
-    background-image: url("/static/assets/icons/icon_settings.png");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 100%;
-    &:active {
-      background-size: 95%;
-    }
-  }
 
   form {
     text-align: center;

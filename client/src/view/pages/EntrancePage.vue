@@ -1,6 +1,6 @@
 <template lang="html">
   <div class="entrance-page">
-    <signup/>
+    <Signup/>
   </div>
 </template>
 
@@ -10,7 +10,7 @@ import Signup from '@/view/components/entrance/Signup'
 
 export default {
   components: {
-    'signup': Signup
+    Signup
   }
 }
 </script>

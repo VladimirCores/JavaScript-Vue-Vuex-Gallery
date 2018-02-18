@@ -17,7 +17,7 @@ import { mapActions } from 'vuex'
 import ApplicationAction from '@/consts/actions/ApplicationAction'
 
 export default {
-  name: 'ServerDataForm',
+  name: 'UserSettings',
   props: {
     user_id: {
       type: String,

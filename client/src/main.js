@@ -5,11 +5,14 @@ import App from '@/App'
 import router from '@/view/router'
 
 import Database from '@/model/Database'
-import ApplicationMutations from '@/consts/mutations/ApplicationMutation'
-import ApplicationActions from '@/consts/actions/ApplicationAction'
+import AuthDTO from '@/model/dtos/AuthDTO'
+import ApplicationAction from '@/consts/actions/ApplicationAction'
+import UserAction from '@/consts/actions/UserAction'
 
 Vue.config.productionTip = false
 Database.init('application').production()
+
+const store = App.store
 
 /* eslint-disable no-new */
 new Vue({
@@ -17,32 +20,25 @@ new Vue({
   router,
   render: h => h(App),
   beforeCreate: function () {
-    let db = Database.getInstance()
+    let db = Database.getApplicationInstance()
     return Promise.all([
-      db.getSession((err, response) => {
-        console.log('> Main -> beforeCreate: session =', response)
-        if (err) {
-          // network error
-        } else if (!response.userCtx.name) {
-          // nobody's logged in
-        } else {
-          // response.userCtx.name is the current user
-          return db.getUser(response.userCtx.name)
-            .then((doc) => {
-              console.log('> Main -> beforeCreate: user =', doc)
-              router.authorized = true
-              App.store.commit(ApplicationMutations.USER_DATA_SETUP, doc)
-            })
+      Database.isAuthorized().then((user) => {
+        console.log('> Main -> beforeCreate: session =', user)
+        if (user) {
+          return db.getUser(user).then((userDoc) => {
+            // console.log('> Main -> beforeCreate: user =', userDoc)
+            let authDTO = new AuthDTO(userDoc, UserAction.CONFIG)
+            return store.dispatch(ApplicationAction.SETUP_USER, authDTO)
+          })
         }
       }),
-      db.get('server', (error, doc) => {
+      db.get('server').then((doc) => {
         console.log('> Main -> beforeCreate: server =', doc)
-        if (error) doc = {}
-        App.store.commit(ApplicationMutations.SERVER_DATA_SETUP, doc)
+        store.dispatch(ApplicationAction.SETUP_SERVER, doc)
       })
     ]).then(function (values) {
       console.log('> Main -> Application Initialized', values)
-      App.store.dispatch(ApplicationActions.INITIALIZED)
+      store.dispatch(ApplicationAction.INITIALIZED)
     }).catch((error) => {
       console.log(error)
     })

@@ -4,8 +4,8 @@
       <header>
         <span>Gallery PWA</span>
         <span v-if="$route.path!=='/'"><router-link to="/" exact>Home</router-link></span>
-        <span v-if="$route.path==='/' && isUserRegistered"><router-link to="/gallery">Gallery</router-link></span>
-        <span v-if="$route.path==='/' && !isUserRegistered"><router-link to="/entrance">Signup</router-link></span>
+        <span v-if="$route.path==='/' && userLoggedIn"><router-link to="/gallery">Gallery</router-link></span>
+        <span v-if="$route.path==='/' && !userLoggedIn"><router-link to="/entrance">Signup</router-link></span>
       </header>
       <main>
         <router-view></router-view>
@@ -19,10 +19,9 @@
 
 import Preloader from '@/view/components/_common/loading/Preloader'
 import ApplicationStore from '@/model/stores/ApplicationStore'
+import ApplicationGetter from '@/consts/getters/ApplicationGetter'
 
 import { mapState, mapGetters } from 'vuex'
-import { USER_STORE_NAME } from '@/consts/StoreNames'
-import { IS_USER_REGISTERED } from '@/consts/getters/UserGetter'
 
 export default {
   name: 'App',
@@ -32,12 +31,12 @@ export default {
   },
   computed: {
     ...mapState(['isReady']),
-    ...mapGetters(USER_STORE_NAME, {
-      'isUserRegistered': IS_USER_REGISTERED
+    ...mapGetters({
+      userLoggedIn: ApplicationGetter.USER_LOGGED_IN
     })
   },
   created () {
-    console.log('> App -> created: USER =', this.$store.state.user.getter)
+    console.log('> App -> created: USER =', this.$store.state)
   }
 }
 </script>
