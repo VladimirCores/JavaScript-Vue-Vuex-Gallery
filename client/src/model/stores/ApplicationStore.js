@@ -4,12 +4,11 @@ import Vuex from 'vuex'
 import ServerVO from '@/model/vos/ServerVO'
 import ApplicationVO from '@/model/vos/ApplicationVO'
 
-// import UserStore from '@/model/stores/UserStore'
-
 import {
   USER_STORE_NAME
 } from '@/consts/StoreNames'
 
+import ApplicationError from '@/consts/errors/ApplicationError'
 import ApplicationAction from '@/consts/actions/ApplicationAction'
 import ApplicationGetter from '@/consts/getters/ApplicationGetter'
 
@@ -23,6 +22,7 @@ import {
 } from '@/consts/mutations/ApplicationMutation'
 
 import Database from '@/model/Database'
+import UserAction from '@/consts/actions/UserAction'
 
 Vue.use(Vuex)
 
@@ -43,10 +43,11 @@ export default new Vuex.Store({
     [ApplicationAction.SETUP_USER] (store, payload) {
       console.log('> ApplicationStore -> ApplicationAction.SETUP_USER payload =', payload)
       return import('@/model/stores/UserStore').then(module => {
-        this.registerModule(USER_STORE_NAME, module.default)
+        store.dispatch(ApplicationAction.REGISTER_MODULE, new ModuleDTO(USER_STORE_NAME, module.default))
         if (payload && payload instanceof AuthDTO) {
-          this.dispatch(USER_STORE_NAME + '/' + payload.action, payload.data)
-          return true
+          return this.dispatch(USER_STORE_NAME + '/' + payload.action, payload.data)
+        } else {
+          return ApplicationError.SETUP_USER_FAILED
         }
       })
     },
@@ -56,8 +57,13 @@ export default new Vuex.Store({
         this.registerModule(payload.name, payload.module)
       }
     },
-    [ApplicationAction.INITIALIZED] (store, payload) {
-      store.commit(APPLICATION_IS_READY, true)
+    [ApplicationAction.INITIALIZED] (store, payload) { store.commit(APPLICATION_IS_READY, true) },
+    [ApplicationAction.EXIT] (store, payload) {
+      console.log('> ApplicationStore -> ApplicationAction.EXIT payload =', payload)
+      this.dispatch(USER_STORE_NAME + '/' + UserAction.LOGOUT).then((result) => {
+        console.log('> ApplicationStore -> ApplicationAction.EXIT unregisterModule =', result)
+        this.unregisterModule(USER_STORE_NAME)
+      })
     }
   },
   getters: {

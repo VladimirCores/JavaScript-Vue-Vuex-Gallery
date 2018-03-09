@@ -2,57 +2,74 @@
   <div class="server-data" @click.prevent.self="onClose">
     <form>
       <a class="close" @click="onClose"/>
-      <div>UserID:</div>
-      <input type="text" v-model="userID"><br>
-      <div>Token:</div>
-      <input type="text" v-model="accessToken"><br>
+
+      <div>UserID:</div><input type="text" v-model="userID"><br>
+      <div>Token:</div><input type="text" v-model="accessToken"><br>
+
       <button type="button" @click="onAccept" :disabled="!validated || !changed">Accept</button>
     </form>
   </div>
 </template>
 
 <script>
+import {
+  USER_STORE_NAME
+} from '@/consts/StoreNames'
 
-import { mapActions } from 'vuex'
-import ApplicationAction from '@/consts/actions/ApplicationAction'
+import UserSettingsAction from '@/consts/actions/UserSettingsAction'
+import UserSettingsError from '@/consts/errors/UserSettingsError'
+import UserSettingsGetter from '@/consts/getters/user/UserSettingsGetter'
+
+import { createNamespacedHelpers } from 'vuex'
+
+const userMapGetters = createNamespacedHelpers(USER_STORE_NAME).mapGetters
+const mapUserSettingsActions = createNamespacedHelpers(USER_STORE_NAME).mapActions
+
+const EVENT_CLOSE = 'onClose'
+const EVENT_USER_CHANGED = 'onUserChanged'
+// const EVENT_TOKEN_CHANGED = 'onTokenChanged'
 
 export default {
   name: 'UserSettings',
-  props: {
-    user_id: {
-      type: String,
-      required: true
-    },
-    access_token: {
-      type: String,
-      required: true
-    }
-  },
   methods: {
-    ...mapActions({
-      changeServerData: ApplicationAction.CHANGE_SERVER_DATA
+    ...mapUserSettingsActions({
+      changeUserSettingsData: UserSettingsAction.CHANGED
     }),
     onClose () {
-      this.$emit('close')
+      this.$emit(EVENT_CLOSE)
     },
     onAccept () {
       this.validated = false
-      this.changeServerData({...this.$data})
+      this.changeUserSettingsData({...this.$data})
         .then((result) => {
+          console.log('> UserSettings -> changeUserSettingsData : result = ' + result)
+          switch (result) {
+            case UserSettingsError.UPDATE_FAILED: break
+            case UserSettingsError.UPDATE_UNEXPECTED: break
+          }
           this.validated = true
+          if (result === true) this.$emit(EVENT_USER_CHANGED)
         })
     }
   },
   computed: {
+    ...userMapGetters({
+      user_id: UserSettingsGetter.GET_USER_ID,
+      access_token: UserSettingsGetter.GET_TOKEN
+    }),
     changed: function () {
       return this.user_id !== this.userID ||
         this.access_token !== this.accessToken
     }
   },
+  created () {
+    this.userID = this.user_id
+    this.accessToken = this.access_token
+  },
   data: function () {
     return {
-      userID: this.user_id,
-      accessToken: this.access_token,
+      userID: '',
+      accessToken: '',
       validated: true
     }
   }

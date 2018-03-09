@@ -1,4 +1,4 @@
-import GetDataGalleryCommand from '@/controller/commands/gallery/GetDataGalleryCommand.js'
+import GetDataGalleryCommand from '@/controller/commands/gallery/SetupGalleryCommand.js'
 
 class NavigateGalleryCommand {
   execute (index, quantity, limit, offset) {

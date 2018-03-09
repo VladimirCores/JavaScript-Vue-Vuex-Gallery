@@ -3,16 +3,18 @@
 
     <div class="icon_settings" @click="openUserSettingsForm"/>
     <transition name="component-fade" mode="out-in">
-      <component v-if="userSettings" v-bind:is="userSettingsForm"
-        :user_id="userSettings.userID"
-        :access_token="userSettings.accessToken"
-        @close="closeUserSettingsForm">
+      <component v-bind:is="userSettingsForm"
+        @onClose="OnCloseUserSettings"
+        @onUserChanged="OnUserChanged"
+      >
       </component>
     </transition>
 
-    <GalleryNavigation
+    <GalleryNavigation v-if="isGalleryReady" keep-alive
       :locked="loading"
-      @navigate="navigateHandler"/>
+      @navigate="navigateHandler"
+    />
+
     <GalleryView v-if="!loading" keep-alive/>
     <Spinner v-else></Spinner>
   </div>
@@ -21,10 +23,13 @@
 <script>
 
 import {
-  GALLERY_STORE_NAME,
-  USER_STORE_NAME,
-  USER_SETTINGS_STORE_NAME
+  GALLERY_STORE_NAME
 } from '@/consts/StoreNames'
+
+import ApplicationAction from '@/consts/actions/ApplicationAction'
+import GalleryGetter from '@/consts/getters/GalleryGetter'
+
+import ModuleDTO from '@/model/dtos/ModuleDTO'
 
 import GalleryStore from '@/model/stores/GalleryStore'
 import GalleryAction from '@/consts/actions/GalleryAction'
@@ -37,8 +42,8 @@ import { createNamespacedHelpers } from 'vuex'
 
 const COMPONENT_USER_SETTINGS = 'component-server-data-form'
 
+const galleryMapGetters = createNamespacedHelpers(GALLERY_STORE_NAME).mapGetters
 const galleryMapActions = createNamespacedHelpers(GALLERY_STORE_NAME).mapActions
-const userMapGetters = createNamespacedHelpers(USER_STORE_NAME).mapGetters
 
 export default {
   name: 'GalleryPage',
@@ -48,36 +53,38 @@ export default {
     GalleryNavigation,
     [COMPONENT_USER_SETTINGS]: ''
   },
+  computed: {
+    ...galleryMapGetters({ isGalleryReady: GalleryGetter.IS_GALLERY_READY })
+  },
   methods: {
     navigateHandler (direction) {
       this.loading = true
-      this.navigateTo(direction).then(() => {
+      this.actionNavigateTo(direction).then(() => {
         this.loading = false
       })
     },
-    ...userMapGetters({
-      userSettings: USER_SETTINGS_STORE_NAME
-    }),
     ...galleryMapActions({
-      navigateTo: GalleryAction.NAVIGATE,
-      getGalleryView: GalleryAction.GET_GALLERY_VIEW
+      actionNavigateTo: GalleryAction.NAVIGATE,
+      actionSetupGalleryView: GalleryAction.SETUP_GALLERY_VIEW
     }),
-    closeUserSettingsForm () { this.userSettingsForm = '' },
-    openUserSettingsForm () { this.userSettingsForm = () => import('@/view/components/index/UserSettings') }
+    OnUserChanged () { this.setup() },
+    OnCloseUserSettings () { this.userSettingsForm = '' },
+    openUserSettingsForm () { this.userSettingsForm = () => import('@/view/components/index/UserSettings') },
+    setup () {
+      this.actionSetupGalleryView().then(status => {
+        switch (status) {
+        }
+        this.loading = !status
+      })
+    }
   },
   beforeCreate () {
-    this.$store.registerModule(GALLERY_STORE_NAME, GalleryStore)
+    this.$store.dispatch(ApplicationAction.REGISTER_MODULE, new ModuleDTO(GALLERY_STORE_NAME, GalleryStore))
   },
   beforeDestroy () {
     this.$store.unregisterModule(GALLERY_STORE_NAME)
   },
-  created () {
-    console.log('userSettings', this.userSettings)
-    this.getGalleryView()
-      .then(success => {
-        this.loading = !success
-      })
-  },
+  created () { this.setup() },
   data () {
     return {
       loading: true,

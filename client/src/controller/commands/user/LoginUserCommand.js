@@ -1,26 +1,32 @@
 import Database from '@/model/Database'
+import UserError from '@/consts/errors/UserError'
 
 class LoginUserCommand {
   execute (name, password) {
-    console.log('> LoginUserCommand > name | password:', name + '|' + password)
+    console.log('===========================================================================')
+    console.log('> LoginUserCommand > name | password:', name + ' | ' + password)
     let db = Database.getApplicationInstance()
     return db
       .logIn(name, password)
       .then((response) => {
         // {"ok":true,"name":"david","roles":[]}
         console.log('> LoginUserCommand > logIn: response =', response)
-        return db.getUser(name).then((response) => {
-          console.log('> LoginUserCommand > getUser: response =', response)
-          return response
-        })
+        if (response.ok) {
+          return db.getUser(name).then((response) => {
+            console.log('> LoginUserCommand > getUser: response =', response)
+            return response
+          })
+        } else {
+          return UserError.LOG_IN_FAILED
+        }
       })
       .catch((error) => {
         console.log('> LoginUserCommand > logIn: error =', error)
         if (error) {
           if (error.name === 'unauthorized' || error.name === 'forbidden') {
-            // name or password incorrect
+            return UserError.LOG_IN_BAD_CREDITS // name or password incorrect
           } else {
-            // cosmic rays, a meteor, etc.
+            return UserError.LOG_IN_UNEXPECTED // cosmic rays, a meteor, etc.
           }
         }
       })

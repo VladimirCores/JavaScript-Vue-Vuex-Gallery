@@ -13,13 +13,7 @@ import Database from '@/model/Database'
 class ConfigUserCommand {
   execute (userDoc) {
     console.log('> ConfigUserCommand > userDoc:', userDoc)
-    return new Promise((resolve, reject) => {
-      Database.configureForUser(
-        userDoc.name,
-        userDoc.password_scheme
-      )
-      resolve()
-    })
+    return Database.configureForUser(userDoc.name, userDoc.password_scheme)
   }
 }
 

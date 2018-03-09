@@ -4,24 +4,31 @@ import GalleryAction from '@/consts/actions/GalleryAction'
 import GalleryGetter from '@/consts/getters/GalleryGetter'
 import GalleryMutation from '@/consts/mutations/GalleryMutation'
 
-import GetDataGalleryCommand from '@/controller/commands/gallery/GetDataGalleryCommand'
+import GetDataGalleryCommand from '@/controller/commands/gallery/SetupGalleryCommand'
 import NavigateGalleryCommand from '@/controller/commands/gallery/NavigateGalleryCommand'
 
+let _PRIVATE_GET_USER_SETTINGS = 'private_getter_get_user_settings'
+let _PRIVATE_GET_SERVER = 'private_getter_get_server'
+
 export default {
-  state: new GalleryVO(1, 5),
+  state: new GalleryVO(),
   strict: true,
   namespaced: true,
   actions: {
-    [GalleryAction.GET_GALLERY_VIEW] (store) {
-      let galleryVO = store.state
-      // console.log('> GalleryStore > GalleryAction.GET_GALLERY_VIEW > getGalleryData', galleryVO)
-      return GetDataGalleryCommand.execute(galleryVO.index, galleryVO.quantity)
+    [GalleryAction.SETUP_GALLERY_VIEW] (store) {
+      let galleryVO = new GalleryVO(1, 5)
+      let serverVO = store.getters[_PRIVATE_GET_SERVER]
+      let userSettingsVO = store.getters[_PRIVATE_GET_USER_SETTINGS]
+      console.log('> GalleryStore > GalleryAction.SETUP_GALLERY_VIEW > userSettings:', userSettingsVO)
+      console.log('> GalleryStore > GalleryAction.SETUP_GALLERY_VIEW > galleryVO', galleryVO)
+      return GetDataGalleryCommand.execute(serverVO, userSettingsVO, galleryVO)
         .then(result => {
           console.log('> GalleryStore > GetGalleryDataCommand > result:', result)
+          store.commit(GalleryMutation.SETUP_GALLERY, galleryVO)
           store.commit(GalleryMutation.UPDATE_GALLERY_VIEW, result)
           return true
         }, (error) => {
-          console.error('> GalleryStore > GetGalleryDataCommand > error:', error)
+          console.log('> GalleryStore > GetGalleryDataCommand > error:', error)
           return false
         })
     },
@@ -44,10 +51,19 @@ export default {
     }
   },
   getters: {
-    [GalleryGetter.IS_NAVIGATE_POSSIBLE_PREV]: state => { return state.view && state.index > 1 },
-    [GalleryGetter.IS_NAVIGATE_POSSIBLE_NEXT]: state => { return state.view && state.index < state.view.limit }
+    [GalleryGetter.IS_GALLERY_READY]: state => {
+      let result = !!state && state.index > 0
+      console.log('GalleryGetter.IS_GALLERY_READY = ' + result)
+      return result
+    },
+    [GalleryGetter.GET_VIEW_INDEX]: state => { return !!state && state.index ? state.index : 0 },
+    [GalleryGetter.IS_NAVIGATE_POSSIBLE_PREV]: state => { return !!state && state.view && state.index > 1 },
+    [GalleryGetter.IS_NAVIGATE_POSSIBLE_NEXT]: state => { return !!state && state.view && state.index < state.view.limit },
+    [_PRIVATE_GET_USER_SETTINGS]: (state, getters, root) => { return root.user ? root.user.settings : null },
+    [_PRIVATE_GET_SERVER]: (state, getters, root) => { return root.server }
   },
   mutations: {
+    [GalleryMutation.SETUP_GALLERY]: (state, payload) => { Object.assign(state, payload) },
     [GalleryMutation.UPDATE_GALLERY_VIEW]: (state, payload) => { state.view = payload },
     [GalleryMutation.UPDATE_GALLERY_VIEW_INDEX]: (state, payload) => { state.index += payload }
   }

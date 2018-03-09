@@ -5,35 +5,40 @@
         <span>Gallery PWA</span>
         <span v-if="$route.path!=='/'"><router-link to="/" exact>Home</router-link></span>
         <span v-if="$route.path==='/' && userLoggedIn"><router-link to="/gallery">Gallery</router-link></span>
-        <span v-if="$route.path==='/' && !userLoggedIn"><router-link to="/entrance">Signup</router-link></span>
+        <span v-if="$route.path==='/' && !userLoggedIn"><router-link to="/entrance">Enter</router-link></span>
+        <span v-if="userLoggedIn"><a href="#" @click="exit">Exit</a></span>
       </header>
       <main>
         <router-view></router-view>
       </main>
     </div>
-    <preloader v-else key="preloader"/>
+    <pre-loader v-else key="pre-loader"/>
   </transition>
 </template>
 
 <script>
 
-import Preloader from '@/view/components/_common/loading/Preloader'
+import PreLoader from '@/view/components/_common/loading/PreLoader'
 import ApplicationStore from '@/model/stores/ApplicationStore'
 import ApplicationGetter from '@/consts/getters/ApplicationGetter'
+import ApplicationAction from '@/consts/actions/ApplicationAction'
 
-import { mapState, mapGetters } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'App',
   store: ApplicationStore,
   components: {
-    'preloader': Preloader
+    'pre-loader': PreLoader
   },
   computed: {
     ...mapState(['isReady']),
     ...mapGetters({
       userLoggedIn: ApplicationGetter.USER_LOGGED_IN
     })
+  },
+  methods: {
+    ...mapActions({ exit: ApplicationAction.EXIT })
   },
   created () {
     console.log('> App -> created: USER =', this.$store.state)

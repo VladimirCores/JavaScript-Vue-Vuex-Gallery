@@ -5,25 +5,35 @@ PouchDB.plugin(PouchAuth)
 /* eslint no-new-symbol: 2 */
 /* eslint-env es6 */
 let _applicationDB = null
+let _applicationLocalDB = null
 let _userDB = null
+let _pendingResolve = null
 
 const DB_URL = 'http://localhost:5984/'
 
 function _convertToHex (str) {
-  var hex = ''
-  for (var i = 0; i < str.length; i++) {
+  let hex = ''
+  let len = str.length
+  for (let i = 0; i < len; i++) {
     hex += '' + str.charCodeAt(i).toString(16)
   }
   return hex
 }
 
+PouchDB.on('created', function (dbName) {
+  console.log('> Database -> DB_CREATED: dbName = ' + dbName)
+  if (_userDB && _userDB.name === dbName && _pendingResolve) {
+    _pendingResolve()
+    _pendingResolve = null
+  }
+})
+
 class Database {
   init (path) {
     console.log('> Database -> Init: ' + path)
     _applicationDB = new PouchDB(`${DB_URL}${path}`, {skip_setup: true})
-    new PouchDB(`local_${path}`)
-      .sync(_applicationDB, {live: true, retry: true})
-      .on('error', console.log.bind(console))
+    _applicationLocalDB = new PouchDB(path)
+    _applicationLocalDB.sync(_applicationDB, {live: true, retry: true})
     return this
   }
 
@@ -32,15 +42,50 @@ class Database {
   production () { PouchDB.debug.disable() }
   debug () { PouchDB.debug.enable('*') }
   configureForUser (username, password) {
+    console.log('===========================================================================')
     console.log('> Database -> configureForUser: username = ' + username)
     console.log('> Database -> configureForUser: password = ' + password)
-    _userDB = new PouchDB(`${DB_URL}/userdb-${_convertToHex(username)}`, {
-      auth: {
-        username: username,
-        password: password
-      },
-      skip_setup: true
+    let promise = new Promise((resolve) => {
+      _pendingResolve = resolve
+      _userDB = new PouchDB('userdb')
+      _userDB.sync(new PouchDB(`${DB_URL}/userdb-${_convertToHex(username).toLowerCase()}`, {
+        auth: {
+          username: username,
+          password: password
+        },
+        skip_setup: true,
+        live: true,
+        retry: true
+      }))
+        .on('change', (change) => {
+          // handle change
+          console.log('> Database -> userDB - change:', change)
+        })
+        .on('paused', (err) => {
+          // replication paused (e.g. replication up to date, user went offline)
+          console.log('> Database -> userDB - paused:', err)
+        })
+        .on('active', () => {
+          // replicate resumed (e.g. new changes replicating, user went back online)
+          console.log('> Database -> userDB - active')
+        })
+        .on('denied', (err) => {
+          // a document failed to replicate (e.g. due to permissions)
+          console.log('> Database -> userDB - denied:', err)
+        })
+        .on('complete', function (info) {
+          // handle complete
+          console.log('> Database -> userDB - complete:', info)
+        })
+        .on('error', (err) => {
+          // handle error
+          console.log('> Database -> userDB - complete:', err)
+        })
+      _userDB.info().then(resolve)
     })
+    console.log('> Database -> USER_DB: _userDB.name = ' + _userDB.name)
+    console.log('===========================================================================')
+    return promise
   }
   isAuthorized () {
     return _applicationDB.getSession()

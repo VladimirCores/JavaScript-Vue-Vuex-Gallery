@@ -1,4 +1,4 @@
 export default {
-  GET_GALLERY_VIEW: 'action_gallery_get_view',
+  SETUP_GALLERY_VIEW: 'action_gallery_setup_view',
   NAVIGATE: 'action_gallery_navigate'
 }

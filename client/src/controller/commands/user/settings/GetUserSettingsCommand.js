@@ -11,6 +11,7 @@ import Database from '@/model/Database'
 class GetSettingsUserCommand {
   execute (userSettingVO) {
     let userDB = Database.getUserInstance()
+    console.log('> GetSettingsUserCommand -> userSettingVO =', userSettingVO)
     return userDB.get('settings')
       .then((doc) => {
         console.log('> GetSettingsUserCommand -> doc =', doc)
