@@ -1,22 +1,27 @@
 <template>
   <div id="gallery-page">
 
-    <div class="icon_settings" @click="openUserSettingsForm"/>
     <transition name="component-fade" mode="out-in">
       <component v-bind:is="userSettingsForm"
-        @onClose="OnCloseUserSettings"
-        @onUserChanged="OnUserChanged"
+        @close="OnCloseUserSettings"
+        @userChange="OnUserChanged"
       >
       </component>
     </transition>
 
+    <GalleryPlayer :selectedItem="selectedItem"/>
+
     <GalleryNavigation v-if="isGalleryReady" keep-alive
       :locked="loading"
-      @navigate="navigateHandler"
+      @navigate="OnNavigateChanged"
     />
 
-    <GalleryView v-if="!loading" keep-alive/>
+    <GalleryView v-if="!loading" keep-alive
+       @select="OnGalleryItemSelected"
+       :selectedItem="selectedItem"
+    />
     <Spinner v-else></Spinner>
+    <div class="icon_settings" @click="openUserSettingsForm"/>
   </div>
 </template>
 
@@ -28,6 +33,7 @@ import {
 
 import ApplicationAction from '@/consts/actions/ApplicationAction'
 import GalleryGetter from '@/consts/getters/GalleryGetter'
+import GalleryError from '@/consts/errors/GalleryError'
 
 import ModuleDTO from '@/model/dtos/ModuleDTO'
 
@@ -36,34 +42,52 @@ import GalleryAction from '@/consts/actions/GalleryAction'
 
 import Spinner from '@/view/components/_common/loading/Spinner.vue'
 import GalleryView from '@/view/components/gallery/GalleryView'
+import GalleryPlayer from '@/view/components/gallery/GalleryPlayer'
 import GalleryNavigation from '@/view/components/gallery/GalleryNavigation'
 
 import { createNamespacedHelpers } from 'vuex'
 
 const COMPONENT_USER_SETTINGS = 'component-server-data-form'
+const GALLERY_STORE_UTILS = createNamespacedHelpers(GALLERY_STORE_NAME)
 
-const galleryMapGetters = createNamespacedHelpers(GALLERY_STORE_NAME).mapGetters
-const galleryMapActions = createNamespacedHelpers(GALLERY_STORE_NAME).mapActions
+const galleryMapState = GALLERY_STORE_UTILS.mapState
+const galleryMapGetters = GALLERY_STORE_UTILS.mapGetters
+const galleryMapActions = GALLERY_STORE_UTILS.mapActions
+
+let ShowErrorToast = (toast) => {
+  return function (message) {
+    toast.error(message, {position: 'bottom-right', duration: 3000})
+  }
+}
 
 export default {
   name: 'GalleryPage',
   components: {
     Spinner,
     GalleryView,
+    GalleryPlayer,
     GalleryNavigation,
     [COMPONENT_USER_SETTINGS]: ''
   },
   computed: {
+    ...galleryMapState(['selectedItem']),
     ...galleryMapGetters({ isGalleryReady: GalleryGetter.IS_GALLERY_READY })
   },
   methods: {
-    navigateHandler (direction) {
+    OnGalleryItemSelected (index) {
+      console.log('clicked', index)
+      this.actionSelectItem(index)
+    },
+    OnNavigateChanged (direction) {
       this.loading = true
-      this.actionNavigateTo(direction).then(() => {
+      this.actionNavigateTo(direction).then((status) => {
+        switch (status) {
+        }
         this.loading = false
       })
     },
     ...galleryMapActions({
+      actionSelectItem: GalleryAction.SELECT_ITEM,
       actionNavigateTo: GalleryAction.NAVIGATE,
       actionSetupGalleryView: GalleryAction.SETUP_GALLERY_VIEW
     }),
@@ -73,12 +97,22 @@ export default {
     setup () {
       this.actionSetupGalleryView().then(status => {
         switch (status) {
+          case GalleryError.WRONG_SERVER_DATA:
+            ShowErrorToast('WRONG SERVER DATA')
+            break
+          case GalleryError.WRONG_USER_SETTINGS_DATA:
+            ShowErrorToast('WRONG USER SERVER DATA')
+            break
+          case GalleryError.REQUESTING_AXIOS_DATA_PROBLEM:
+            ShowErrorToast('SERVER REQUEST FAILED')
+            break
         }
         this.loading = !status
       })
     }
   },
   beforeCreate () {
+    ShowErrorToast = ShowErrorToast(this.$toasted)
     this.$store.dispatch(ApplicationAction.REGISTER_MODULE, new ModuleDTO(GALLERY_STORE_NAME, GalleryStore))
   },
   beforeDestroy () {
@@ -106,8 +140,8 @@ export default {
 
   .icon_settings {
     position: absolute;
-    right: 0;
-    margin-right: 1rem;
+    right: 1rem;
+    bottom: 1rem;
     width: 25px;
     height: 25px;
     background-image: url("/static/assets/icons/icon_settings.png");

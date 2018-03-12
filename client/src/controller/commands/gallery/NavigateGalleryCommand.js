@@ -1,13 +1,20 @@
-import GetDataGalleryCommand from '@/controller/commands/gallery/SetupGalleryCommand.js'
+import GetGalleryDataCommand from '@/controller/commands/gallery/GetGalleryDataCommand.js'
+
+import GalleryError from '@/consts/errors/GalleryError'
 
 class NavigateGalleryCommand {
-  execute (index, quantity, limit, offset) {
-    let nextIndex = index + offset
-    console.log('> \t NavigateGalleryCommand > nextIndex =', nextIndex)
+  execute (
+    serverVO,
+    userSettingsVO,
+    galleryVO,
+    offset
+  ) {
+    galleryVO.index = galleryVO.index + offset
+    console.log('> NavigateGalleryCommand > nextIndex =', galleryVO.index)
 
-    if (nextIndex < 1) return Promise.reject(new Error('Index outside of the range'))
+    if (galleryVO.index < 1) return Promise.reject(GalleryError.INDEX_LESS_THAN_MINIMUM)
 
-    return GetDataGalleryCommand.execute(nextIndex, quantity)
+    return GetGalleryDataCommand.execute(serverVO, userSettingsVO, galleryVO)
   }
 }
 

@@ -1,5 +1,12 @@
 <template>
-    <img class="gallery-view-item" :src="imageUrl"/>
+    <div @click="onSelected(index)"
+      v-bind:class="{
+        'gallery-view-item': true,
+        'selected':isSelected
+      }"
+    >
+      <img :src="imageUrl"/>
+    </div>
 </template>
 
 <script>
@@ -7,16 +14,26 @@ export default
 {
   name: 'GalleryViewItem',
   props: [
-    'imageUrl'
+    'index',
+    'imageUrl',
+    'onSelected',
+    'isSelected'
   ],
   beforeUpdate () {
-    console.log(this.url)
+    console.log(this.imageUrl)
   }
 }
 </script>
 
-<style lang='scss'>
+<style scoped lang='scss'>
+.selected {
+  img {
+    outline: 3px solid deepskyblue;
+    outline-offset: -4px;
+  }
+}
 .gallery-view-item {
   margin: 0.25em;
+  display: inline-block;
 }
 </style>

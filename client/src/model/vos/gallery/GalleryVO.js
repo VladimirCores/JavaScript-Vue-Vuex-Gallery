@@ -3,5 +3,6 @@ export default class GalleryVO {
     this.index = index
     this.quantity = quantity
     this.view = null
+    this.selectedItem = null
   }
 }

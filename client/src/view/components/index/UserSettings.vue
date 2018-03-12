@@ -25,9 +25,8 @@ import { createNamespacedHelpers } from 'vuex'
 const userMapGetters = createNamespacedHelpers(USER_STORE_NAME).mapGetters
 const mapUserSettingsActions = createNamespacedHelpers(USER_STORE_NAME).mapActions
 
-const EVENT_CLOSE = 'onClose'
-const EVENT_USER_CHANGED = 'onUserChanged'
-// const EVENT_TOKEN_CHANGED = 'onTokenChanged'
+const EVENT_CLOSE = 'close'
+const EVENT_USER_CHANGED = 'userChange'
 
 export default {
   name: 'UserSettings',

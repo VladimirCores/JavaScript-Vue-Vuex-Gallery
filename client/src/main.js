@@ -8,7 +8,9 @@ import Database from '@/model/Database'
 import AuthDTO from '@/model/dtos/AuthDTO'
 import ApplicationAction from '@/consts/actions/ApplicationAction'
 import UserAction from '@/consts/actions/UserAction'
+import Toasted from 'vue-toasted'
 
+Vue.use(Toasted)
 Vue.config.productionTip = false
 Database.init('application').production()
 
