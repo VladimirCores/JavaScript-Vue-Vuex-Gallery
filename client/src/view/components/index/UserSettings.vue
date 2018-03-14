@@ -43,8 +43,10 @@ export default {
         .then((result) => {
           console.log('> UserSettings -> changeUserSettingsData : result = ' + result)
           switch (result) {
-            case UserSettingsError.UPDATE_FAILED: break
-            case UserSettingsError.UPDATE_UNEXPECTED: break
+            case UserSettingsError.UPDATE_FAILED:
+              break
+            case UserSettingsError.UPDATE_UNEXPECTED:
+              break
           }
           this.validated = true
           if (result === true) this.$emit(EVENT_USER_CHANGED)
@@ -80,6 +82,7 @@ export default {
 
   .server-data
   {
+    z-index: 1000;
     background-color: rgba(0,0,0,0.3);
     display: flex;
     align-items: center;

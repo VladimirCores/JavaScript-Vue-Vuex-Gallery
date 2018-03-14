@@ -57,7 +57,6 @@ export default
 
 <style lang="scss">
 .gallery-navigation{
-  margin: 1rem;
   button {
     padding: 0.5rem 1rem;
     margin: 0.5rem;

@@ -53,10 +53,11 @@ class Database {
           username: username,
           password: password
         },
-        skip_setup: true,
+        skip_setup: true
+      }), {
         live: true,
         retry: true
-      }))
+      })
         .on('change', (change) => {
           // handle change
           console.log('> Database -> userDB - change:', change)

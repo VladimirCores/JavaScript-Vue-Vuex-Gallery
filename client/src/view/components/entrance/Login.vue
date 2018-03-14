@@ -1,15 +1,11 @@
 <template lang="html">
-  <div class="signup" v-if="!isUserLoggedIn">
+  <div class="login" v-if="!isUserLoggedIn">
     <form>
-      <div>First Name:</div>
-      <input type="text" v-model="firstName"><br>
-      <div>Last Name:</div>
-      <input type="text" v-model="lastName"><br>
       <div>Email:</div>
-      <input type="text" v-model="email"><br>
+      <input type="text" v-model="name"><br>
       <div>Password:</div>
       <input type="text" v-model="password"><br>
-      <button type="button" @click="onSignup" :disabled="!validated">Signup</button>
+      <button type="button" @click="onLogin" :disabled="!validated">Login</button>
     </form>
   </div>
 </template>
@@ -25,20 +21,33 @@ import ApplicationAction from '@/consts/actions/ApplicationAction'
 import ApplicationGetter from '@/consts/getters/ApplicationGetter'
 
 import { mapActions, mapGetters } from 'vuex'
+import {
+  ConstructMessageToast,
+  ConstructErrorToast
+} from '@/view/components/_common/Toast'
+
+let showMessage
+let showError
 
 export default {
-  name: 'Signup',
+  name: 'Login',
   methods: {
-    ...mapActions({ signup: ApplicationAction.SETUP_USER }),
-    onSignup () {
-      this.signup(new AuthDTO(this.$data, UserAction.SIGNUP))
+    ...mapActions({ login: ApplicationAction.SETUP_USER }),
+    onLogin () {
+      this.login(new AuthDTO(this.$data, UserAction.LOGIN))
         .then(result => {
           switch (result) {
-            case UserError.SIGN_UP_FAILED:
+            case UserError.LOG_IN_FAILED:
+              showError('LOGIN FAILED')
               break
-            case UserError.SIGN_UP_RESPONSE:
+            case UserError.LOG_IN_BAD_CREDITS:
+              showError('LOGIN BAD CREDITS')
+              break
+            case UserError.LOG_IN_UNEXPECTED:
+              showError('LOGIN UNEXPECTED')
               break
             default:
+              showMessage('LOGGED IN SUCCESSFUL')
               this.$router.push({ name: PageNames.INDEX })
           }
         })
@@ -49,27 +58,26 @@ export default {
       'isUserLoggedIn': ApplicationGetter.USER_LOGGED_IN
     }),
     validated: function () {
-      return this.firstName.length > 0 &&
-        this.lastName.length > 0 &&
-        this.password.length > 0 &&
-        (this.email.length > 0 && this.email.indexOf('@') > 1)
+      return this.password.length > 0 &&
+        (this.name.length > 0 && this.name.indexOf('@') > 1)
     }
+  },
+  created () {
+    showMessage = ConstructMessageToast(this.$toasted)
+    showError = ConstructErrorToast(this.$toasted)
   },
   data: function () {
     return {
-      firstName: '',
-      lastName: '',
-      email: '',
+      name: '',
       password: ''
     }
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 
-  .signup
+  .login
   {
     display: flex;
     align-items: center;

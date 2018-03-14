@@ -1,6 +1,6 @@
 <template>
   <div class="index-page">
-
+    <div :style="{ 'width': width + 'px', 'height': height + 'px', 'background-image': 'url(' + imageURL() + ')' }"/>
   </div>
 </template>
 
@@ -16,9 +16,14 @@ export default {
     ])
   },
   methods: {
+    imageURL () {
+      return `https://source.unsplash.com/${this.width}x${this.height}`
+    }
   },
   data () {
     return {
+      width: window.innerWidth,
+      height: window.innerHeight
     }
   }
 }

@@ -16,9 +16,7 @@ class LoginUserCommand {
             console.log('> LoginUserCommand > getUser: response =', response)
             return response
           })
-        } else {
-          return UserError.LOG_IN_FAILED
-        }
+        } else return UserError.LOG_IN_FAILED
       })
       .catch((error) => {
         console.log('> LoginUserCommand > logIn: error =', error)

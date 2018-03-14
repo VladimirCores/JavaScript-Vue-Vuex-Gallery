@@ -47,7 +47,6 @@ import GalleryNavigation from '@/view/components/gallery/GalleryNavigation'
 
 import { createNamespacedHelpers } from 'vuex'
 
-const COMPONENT_USER_SETTINGS = 'component-server-data-form'
 const GALLERY_STORE_UTILS = createNamespacedHelpers(GALLERY_STORE_NAME)
 
 const galleryMapState = GALLERY_STORE_UTILS.mapState
@@ -66,8 +65,7 @@ export default {
     Spinner,
     GalleryView,
     GalleryPlayer,
-    GalleryNavigation,
-    [COMPONENT_USER_SETTINGS]: ''
+    GalleryNavigation
   },
   computed: {
     ...galleryMapState(['selectedItem']),

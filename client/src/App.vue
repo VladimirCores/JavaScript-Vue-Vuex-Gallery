@@ -73,7 +73,6 @@ export default {
 
   main {
     text-align: center;
-    margin-top: 1rem;
   }
 
   header {
