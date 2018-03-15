@@ -6,7 +6,7 @@
         <span v-if="$route.path!=='/'"><router-link to="/" exact>Home</router-link></span>
         <span v-if="$route.path==='/' && userLoggedIn"><router-link to="/gallery">Gallery</router-link></span>
         <span v-if="$route.path==='/' && !userLoggedIn"><router-link to="/entrance">Enter</router-link></span>
-        <span v-if="userLoggedIn"><a href="#" @click="exit">Exit</a></span>
+        <span v-if="userLoggedIn"><a href="#" @click="onExit">Exit</a></span>
       </header>
       <main>
         <router-view></router-view>
@@ -22,6 +22,7 @@ import PreLoader from '@/view/components/_common/loading/PreLoader'
 import ApplicationStore from '@/model/stores/ApplicationStore'
 import ApplicationGetter from '@/consts/getters/ApplicationGetter'
 import ApplicationAction from '@/consts/actions/ApplicationAction'
+import PageNames from '@/consts/PageNames'
 
 import { mapState, mapGetters, mapActions } from 'vuex'
 
@@ -38,7 +39,8 @@ export default {
     })
   },
   methods: {
-    ...mapActions({ exit: ApplicationAction.EXIT })
+    ...mapActions({ exitAction: ApplicationAction.EXIT }),
+    onExit () { this.exitAction().then(() => this.$router.push({ name: PageNames.EXIT })) }
   },
   created () {
     console.log('> App -> created: USER =', this.$store.state)

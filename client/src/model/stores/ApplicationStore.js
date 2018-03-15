@@ -26,6 +26,8 @@ import UserAction from '@/consts/actions/UserAction'
 
 Vue.use(Vuex)
 
+const registeredModules = []
+
 export default new Vuex.Store({
   state: new ApplicationVO(),
   strict: true,
@@ -37,9 +39,7 @@ export default new Vuex.Store({
         .then(doc => doc.ok && !store.commit(SERVER_DATA_UPDATE, Object.assign(payload, {_rev: doc.rev})))
         .catch(error => !error)
     },
-    [ApplicationAction.SETUP_SERVER] (store, payload) {
-      store.commit(SERVER_DATA_SETUP, payload)
-    },
+    [ApplicationAction.SETUP_SERVER] (store, payload) { store.commit(SERVER_DATA_SETUP, payload) },
     [ApplicationAction.SETUP_USER] (store, payload) {
       console.log('> ApplicationStore -> ApplicationAction.SETUP_USER payload =', payload)
       return import('@/model/stores/UserStore').then(module => {
@@ -54,10 +54,12 @@ export default new Vuex.Store({
     [ApplicationAction.REGISTER_MODULE] (store, payload) {
       console.log('> ApplicationStore -> ApplicationAction.REGISTER_MODULE payload =', payload)
       if (payload && payload instanceof ModuleDTO) {
-        this.registerModule(payload.name, payload.module)
+        let moduleName = payload.name
+        registeredModules.push(moduleName)
+        this.registerModule(moduleName, payload.module)
       }
     },
-    [ApplicationAction.INITIALIZED] (store, payload) { store.commit(APPLICATION_IS_READY, true) },
+    [ApplicationAction.INITIALIZED] (store) { store.commit(APPLICATION_IS_READY, true) },
     [ApplicationAction.EXIT] (store, payload) {
       console.log('> ApplicationStore -> ApplicationAction.EXIT payload =', payload)
       this.dispatch(USER_STORE_NAME + '/' + UserAction.LOGOUT).then((result) => {

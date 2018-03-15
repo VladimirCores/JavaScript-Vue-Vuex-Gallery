@@ -14,7 +14,7 @@ export const ConstructErrorToast = (toast) => {
 
 export const ConstructMessageToast = (toast) => {
   return function (message) {
-    toast.show(message, SETTINGS)
+    toast.success(message, SETTINGS)
   }
 }
 
