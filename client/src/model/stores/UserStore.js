@@ -24,6 +24,12 @@ const UserStore = {
   modules: {
     [USER_SETTINGS_STORE_NAME]: UserSettingsStore
   },
+  onRegister () {
+    console.log('> UserStore -> onRegister')
+  },
+  onRemove () {
+    console.log('> UserStore -> onRemove')
+  },
   actions: {
     [UserAction.SIGNUP]: (store, payload) => {
       console.log('> UserStore -> UserAction.SIGN_UP : payload =', !!payload)
@@ -41,8 +47,9 @@ const UserStore = {
     [UserAction.LOGIN]: (store, payload) => {
       console.log('> UserStore -> UserAction.LOGIN : payload =', !!payload)
       return LoginUserCommand.execute(payload.name, payload.password).then((result) => {
-        console.log('> UserStore -> UserAction.LOGIN : result =', !!result)
-        return store.dispatch(UserAction.CONFIG, result)
+        console.log('> UserStore -> UserAction.LOGIN : result =', result)
+        if (Number.isInteger(result)) return result
+        else return store.dispatch(UserAction.CONFIG, result)
       })
     },
     [UserAction.LOGOUT]: (store) => {
@@ -70,11 +77,10 @@ const UserStore = {
   },
   mutations: {
     [UserMutation.SIGN_UP_USER]: (state, payload) => { Object.assign(state, payload) },
-    [UserMutation.LOG_OUT_USER]: (state) => { for (let key in state) { delete state[key] } },
+    [UserMutation.LOG_OUT_USER]: (state) => { for (let key in state) delete state[key] },
     [UserMutation.LOG_IN_USER]: (state, payload) => {
-      let user = new UserVO()
       console.log('> UserStore -> UserMutation.LOG_IN_USER')
-      for (var key in user) state[key] = payload[key]
+      Object.assign(state, Object.assign(new UserVO(), payload))
     }
   }
 }

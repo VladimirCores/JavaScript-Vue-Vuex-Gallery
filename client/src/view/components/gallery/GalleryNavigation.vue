@@ -59,7 +59,7 @@ export default
 .gallery-navigation{
   button {
     padding: 0.5rem 1rem;
-    margin: 0.5rem;
+    margin: 0.75rem 0.5rem 0.5rem 0.5rem;
     border: 1px solid black;
     border-radius: 5%;
     background: none;

@@ -1,46 +1,35 @@
 <template>
   <transition name="fade" mode="out-in">
     <div id="app" v-if="isReady" key="app">
-      <header>
-        <span>Gallery PWA</span>
-        <span v-if="$route.path!=='/'"><router-link to="/" exact>Home</router-link></span>
-        <span v-if="$route.path==='/' && userLoggedIn"><router-link to="/gallery">Gallery</router-link></span>
-        <span v-if="$route.path==='/' && !userLoggedIn"><router-link to="/entrance">Enter</router-link></span>
-        <span v-if="userLoggedIn"><a href="#" @click="onExit">Exit</a></span>
-      </header>
+      <Header/>
       <main>
         <router-view></router-view>
       </main>
     </div>
-    <pre-loader v-else key="pre-loader"/>
+    <PreLoader v-else key="pre-loader"/>
   </transition>
 </template>
 
 <script>
 
 import PreLoader from '@/view/components/_common/loading/PreLoader'
-import ApplicationStore from '@/model/stores/ApplicationStore'
-import ApplicationGetter from '@/consts/getters/ApplicationGetter'
-import ApplicationAction from '@/consts/actions/ApplicationAction'
-import PageNames from '@/consts/PageNames'
+import Header from '@/view/components/Header'
 
-import { mapState, mapGetters, mapActions } from 'vuex'
+import ApplicationStore from '@/model/stores/ApplicationStore'
+
+import { mapState } from 'vuex'
 
 export default {
   name: 'App',
   store: ApplicationStore,
   components: {
-    'pre-loader': PreLoader
+    Header,
+    PreLoader
   },
   computed: {
-    ...mapState(['isReady']),
-    ...mapGetters({
-      userLoggedIn: ApplicationGetter.USER_LOGGED_IN
-    })
+    ...mapState(['isReady'])
   },
   methods: {
-    ...mapActions({ exitAction: ApplicationAction.EXIT }),
-    onExit () { this.exitAction().then(() => this.$router.push({ name: PageNames.EXIT })) }
   },
   created () {
     console.log('> App -> created: USER =', this.$store.state)
@@ -60,6 +49,7 @@ export default {
 
   body {
     margin: 0;
+    background-color: #f9f9f9;
   }
 
   #app {
@@ -75,32 +65,6 @@ export default {
 
   main {
     text-align: center;
-  }
-
-  header {
-    margin: 0;
-    height: 56px;
-    padding: 0 16px 0 24px;
-    background-color: #35495E;
-    color: #ffffff;
-  }
-
-  header span {
-    display: inline-block;
-    color: white;
-    position: relative;
-    font-size: 20px;
-    line-height: 1;
-    letter-spacing: .02em;
-    font-weight: 400;
-    box-sizing: border-box;
-    padding-top: 16px;
-    margin-right: 1em;
-  }
-
-  header span a {
-    color: white;
-    text-decoration: none;
   }
 
 </style>

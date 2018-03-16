@@ -9,7 +9,12 @@
       </component>
     </transition>
 
-    <GalleryPlayer :selectedItem="selectedItem"/>
+    <GalleryPlayer
+      :selectedItem="selectedItem"
+      :loading="videoLoading"
+      @loaded="OnVideoLoaded"
+      @ready="OnVideoPlayerReady"
+    />
 
     <GalleryNavigation v-if="isGalleryReady" keep-alive
       :locked="loading"
@@ -47,17 +52,17 @@ import GalleryNavigation from '@/view/components/gallery/GalleryNavigation'
 
 import { createNamespacedHelpers } from 'vuex'
 
+import {
+  ConstructErrorToast
+} from '@/view/components/_common/Toast'
+
 const GALLERY_STORE_UTILS = createNamespacedHelpers(GALLERY_STORE_NAME)
 
 const galleryMapState = GALLERY_STORE_UTILS.mapState
 const galleryMapGetters = GALLERY_STORE_UTILS.mapGetters
 const galleryMapActions = GALLERY_STORE_UTILS.mapActions
 
-let ShowErrorToast = (toast) => {
-  return function (message) {
-    toast.error(message, {position: 'bottom-right', duration: 3000})
-  }
-}
+let ShowErrorToast
 
 export default {
   name: 'GalleryPage',
@@ -72,8 +77,14 @@ export default {
     ...galleryMapGetters({ isGalleryReady: GalleryGetter.IS_GALLERY_READY })
   },
   methods: {
+    OnVideoPlayerReady () {
+      this.videoLoading = true
+    },
+    OnVideoLoaded () {
+      this.videoLoading = false
+    },
     OnGalleryItemSelected (index) {
-      console.log('clicked', index)
+      this.videoLoading = true
       this.actionSelectItem(index)
     },
     OnNavigateChanged (direction) {
@@ -110,16 +121,17 @@ export default {
     }
   },
   beforeCreate () {
-    ShowErrorToast = ShowErrorToast(this.$toasted)
-    this.$store.dispatch(ApplicationAction.REGISTER_MODULE, new ModuleDTO(GALLERY_STORE_NAME, GalleryStore))
+    ShowErrorToast = ConstructErrorToast(this.$toasted)
+    this.$store.dispatch(ApplicationAction.REGISTER_MODULE, new ModuleDTO(GalleryStore))
   },
   beforeDestroy () {
-    this.$store.unregisterModule(GALLERY_STORE_NAME)
+    this.$store.dispatch(ApplicationAction.DEREGISTER_MODULE, GalleryStore)
   },
   created () { this.setup() },
   data () {
     return {
       loading: true,
+      videoLoading: false,
       userSettingsForm: ''
     }
   }

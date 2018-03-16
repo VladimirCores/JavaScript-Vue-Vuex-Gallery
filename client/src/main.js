@@ -1,6 +1,8 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
+import VueToasted from 'vue-toasted'
+
 import App from '@/App'
 import router from '@/view/router'
 
@@ -8,9 +10,8 @@ import Database from '@/model/Database'
 import AuthDTO from '@/model/dtos/AuthDTO'
 import ApplicationAction from '@/consts/actions/ApplicationAction'
 import UserAction from '@/consts/actions/UserAction'
-import Toasted from 'vue-toasted'
 
-Vue.use(Toasted)
+Vue.use(VueToasted)
 Vue.config.productionTip = false
 Database.init('application').production()
 
@@ -28,7 +29,7 @@ new Vue({
         console.log('> Main -> beforeCreate: session =', user)
         if (user) {
           return db.getUser(user).then((userDoc) => {
-            // console.log('> Main -> beforeCreate: user =', userDoc)
+            console.log('> Main -> beforeCreate: user =', userDoc)
             let authDTO = new AuthDTO(userDoc, UserAction.CONFIG)
             return store.dispatch(ApplicationAction.SETUP_USER, authDTO)
           })

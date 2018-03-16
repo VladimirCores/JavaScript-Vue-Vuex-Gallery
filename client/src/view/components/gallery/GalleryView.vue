@@ -5,6 +5,8 @@
       :imageUrl="item.imageUrl"
       :key="item.uri"
       :index="item.index"
+      :width="item.width"
+      :height="item.height"
       :onSelected="OnGalleryItemSelected"
       :isSelected="isItemSelected(item)"
     />

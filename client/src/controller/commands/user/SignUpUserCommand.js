@@ -28,6 +28,9 @@ class SignUpUserCommand {
       })
       .catch((error) => {
         console.log('> SignUpUserCommand > signUp: error =', error)
+        if (error.error === 'conflict') {
+          return UserError.SIGN_UP_USER_ALREADY_EXIST
+        }
         return UserError.SIGN_UP_FAILED
       })
   }

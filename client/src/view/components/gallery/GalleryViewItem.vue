@@ -1,5 +1,6 @@
 <template>
     <div @click="onSelected(index)"
+      :style="{width: width + 'px', height: height + 'px'}"
       v-bind:class="{
         'gallery-view-item': true,
         'selected':isSelected
@@ -17,11 +18,10 @@ export default
     'index',
     'imageUrl',
     'onSelected',
-    'isSelected'
-  ],
-  beforeUpdate () {
-    console.log(this.imageUrl)
-  }
+    'isSelected',
+    'width',
+    'height'
+  ]
 }
 </script>
 
@@ -35,5 +35,6 @@ export default
 .gallery-view-item {
   margin: 0.25em;
   display: inline-block;
+  background-color: #f1f1f1;
 }
 </style>

@@ -26,6 +26,14 @@ import ApplicationGetter from '@/consts/getters/ApplicationGetter'
 
 import { mapActions, mapGetters } from 'vuex'
 
+import {
+  ConstructMessageToast,
+  ConstructErrorToast
+} from '@/view/components/_common/Toast'
+
+let showMessage
+let showError
+
 export default {
   name: 'Signup',
   methods: {
@@ -35,18 +43,25 @@ export default {
         .then(result => {
           switch (result) {
             case UserError.SIGN_UP_FAILED:
+              showError('NETWORK ERROR')
               break
             case UserError.SIGN_UP_RESPONSE:
+              showError('RESPONSE ERROR')
+              break
+            case UserError.SIGN_UP_USER_ALREADY_EXIST:
+              showError('USER ALREADY EXIST')
               break
             default:
+              showMessage('SIGNUP SUCCESSFUL')
               this.$router.push({ name: PageNames.INDEX })
+              break
           }
         })
     }
   },
   computed: {
     ...mapGetters({
-      'isUserLoggedIn': ApplicationGetter.USER_LOGGED_IN
+      'isUserLoggedIn': ApplicationGetter.IS_USER_LOGGED
     }),
     validated: function () {
       return this.firstName.length > 0 &&
@@ -54,6 +69,10 @@ export default {
         this.password.length > 0 &&
         (this.email.length > 0 && this.email.indexOf('@') > 1)
     }
+  },
+  created () {
+    showMessage = ConstructMessageToast(this.$toasted)
+    showError = ConstructErrorToast(this.$toasted)
   },
   data: function () {
     return {

@@ -41,7 +41,7 @@ const Router = new VueRouter({
       path: '/exit',
       name: PageNames.EXIT,
       component: () => import('@/view/pages/ExitPage'),
-      beforeEnter (to, from, next) { isAuthorized(next, PageNames.EXIT, true) }
+      beforeEnter (to, from, next) { isAuthorized(next, PageNames.INDEX) }
     }
   ],
   mode: 'history'

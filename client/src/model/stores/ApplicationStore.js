@@ -12,16 +12,20 @@ import ApplicationError from '@/consts/errors/ApplicationError'
 import ApplicationAction from '@/consts/actions/ApplicationAction'
 import ApplicationGetter from '@/consts/getters/ApplicationGetter'
 
+import LoadImageUtilsCommand from '@/controller/commands/utils/LoadImageUtilsCommand'
+
 import AuthDTO from '@/model/dtos/AuthDTO'
 import ModuleDTO from '@/model/dtos/ModuleDTO'
+import LoadImageDTO from '@/model/dtos/LoadImageDTO'
 
 import {
-  APPLICATION_IS_READY,
+  SET_APPLICATION_IS_READY,
+  SET_BACKGROUND_IMAGE,
   SERVER_DATA_UPDATE,
-  SERVER_DATA_SETUP
+  SERVER_DATA_SETUP,
+  SET_USER_LOGGED
 } from '@/consts/mutations/ApplicationMutation'
 
-import Database from '@/model/Database'
 import UserAction from '@/consts/actions/UserAction'
 
 Vue.use(Vuex)
@@ -33,46 +37,64 @@ export default new Vuex.Store({
   strict: true,
   namespaced: true,
   actions: {
-    [ApplicationAction.CHANGE_SERVER_DATA] (store, payload) {
-      return Database.getApplicationInstance()
-        .put(Object.assign({...store.state.server}, payload))
-        .then(doc => doc.ok && !store.commit(SERVER_DATA_UPDATE, Object.assign(payload, {_rev: doc.rev})))
-        .catch(error => !error)
-    },
     [ApplicationAction.SETUP_SERVER] (store, payload) { store.commit(SERVER_DATA_SETUP, payload) },
     [ApplicationAction.SETUP_USER] (store, payload) {
       console.log('> ApplicationStore -> ApplicationAction.SETUP_USER payload =', payload)
       return import('@/model/stores/UserStore').then(module => {
-        store.dispatch(ApplicationAction.REGISTER_MODULE, new ModuleDTO(USER_STORE_NAME, module.default))
+        let moduleDTO = new ModuleDTO(module.default)
+        store.dispatch(ApplicationAction.REGISTER_MODULE, moduleDTO)
         if (payload && payload instanceof AuthDTO) {
-          return this.dispatch(USER_STORE_NAME + '/' + payload.action, payload.data)
+          return store.dispatch(USER_STORE_NAME + '/' + payload.action, payload.data).then((result) => {
+            if (Number.isInteger(result)) store.dispatch(ApplicationAction.DEREGISTER_MODULE, moduleDTO.module)
+            else store.commit(SET_USER_LOGGED, true)
+            return result
+          })
         } else {
           return ApplicationError.SETUP_USER_FAILED
         }
       })
     },
+    [ApplicationAction.DEREGISTER_MODULE] (store, payload) {
+      this.unregisterModule(payload.name)
+      payload.onRemove && payload.onRemove()
+    },
     [ApplicationAction.REGISTER_MODULE] (store, payload) {
       console.log('> ApplicationStore -> ApplicationAction.REGISTER_MODULE payload =', payload)
       if (payload && payload instanceof ModuleDTO) {
-        let moduleName = payload.name
-        registeredModules.push(moduleName)
-        this.registerModule(moduleName, payload.module)
+        let module = payload.module
+        registeredModules.push(module)
+        this.registerModule(module.name, module)
+        module.onRegister && module.onRegister()
       }
     },
-    [ApplicationAction.INITIALIZED] (store) { store.commit(APPLICATION_IS_READY, true) },
+    [ApplicationAction.LOAD_IMAGE] (store, payload) {
+      if (payload && payload instanceof LoadImageDTO) {
+        return LoadImageUtilsCommand.execute(payload.url, payload.onprogress)
+      }
+    },
+    [ApplicationAction.INITIALIZED] (store) { store.commit(SET_APPLICATION_IS_READY, true) },
     [ApplicationAction.EXIT] (store, payload) {
       console.log('> ApplicationStore -> ApplicationAction.EXIT payload =', payload)
       this.dispatch(USER_STORE_NAME + '/' + UserAction.LOGOUT).then((result) => {
-        console.log('> ApplicationStore -> ApplicationAction.EXIT unregisterModule =', result)
-        this.unregisterModule(USER_STORE_NAME)
+        store.commit(SET_USER_LOGGED, false)
+        while (registeredModules.length) {
+          let module = registeredModules.shift()
+          console.log('> ApplicationStore -> ApplicationAction.EXIT unregisterModule =', module.name)
+          store.dispatch(ApplicationAction.DEREGISTER_MODULE, module)
+        }
       })
     }
   },
   getters: {
-    [ApplicationGetter.USER_LOGGED_IN] (state) { return !!state.user }
+    [ApplicationGetter.IS_USER_LOGGED] (state) {
+      console.log('> ApplicationStore -> ApplicationGetter.IS_USER_LOGGED: ' + (state.user && state.user.name))
+      return state.user && state.user.name
+    }
   },
   mutations: {
-    [APPLICATION_IS_READY]: (state, payload) => { state.isReady = payload },
+    [SET_USER_LOGGED]: (state, payload) => { state.logged = payload },
+    [SET_BACKGROUND_IMAGE]: (state, payload) => { state.backgroundImage = payload },
+    [SET_APPLICATION_IS_READY]: (state, payload) => { state.isReady = payload },
     [SERVER_DATA_UPDATE]: (state, payload) => { Object.assign(state.server, payload) },
     [SERVER_DATA_SETUP]: (state, payload) => { state.server = Object.assign(new ServerVO(), payload) }
   }

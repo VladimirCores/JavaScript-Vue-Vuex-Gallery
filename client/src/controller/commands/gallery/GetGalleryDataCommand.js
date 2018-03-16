@@ -47,8 +47,9 @@ class GetGalleryDataCommand {
             let resolution = RESOLUTIONS.R_200_150
             let galleryItems = inputData.data.map((item, index) => {
               // console.log('> GetDataGalleryCommand > item', index, item)
-              let imageUrl = item.pictures.sizes[resolution].link
-              return new GalleryViewItemVO(index, item.name, item.uri, imageUrl)
+              let size = item.pictures.sizes[resolution]
+              let imageUrl = size.link
+              return new GalleryViewItemVO(index, item.name, item.uri, imageUrl, size.width, size.height)
             })
             let pagesLimit = Math.ceil(inputData.total / quantity)
             resolve(new GalleryViewVO(pagesLimit, galleryItems))

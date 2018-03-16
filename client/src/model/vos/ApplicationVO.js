@@ -3,5 +3,6 @@ export default class ApplicationVO {
     this.device = null
     this.server = null
     this.isReady = false
+    this.logged = false
   }
 }

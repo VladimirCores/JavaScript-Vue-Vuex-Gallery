@@ -1,40 +1,83 @@
 <template>
-  <div class="gallery-video-player">
+  <div class="gallery-player">
     <VideoPlayer class="video-player" v-if="selectedItem"
      ref="player"
      :video-id="videoURL"
-     :player-height="height"
+     :player-width="playerWidth"
+     :player-height="playerHeight"
      @ready="onReady"
+     @loaded="onLoaded"
     ></VideoPlayer>
     <div class="cover" v-bind:style="{ height: height + 'px' }"/>
+    <AssetSpinner v-if="loading"></AssetSpinner>
   </div>
 </template>
 
 <script>
 import { vueVimeoPlayer } from 'vue-vimeo-player'
+import AssetSpinner from '@/view/components/_common/loading/AssetSpinner'
+
+const EVENT_LOADED = 'loaded'
+const EVENT_READY = 'ready'
 
 export default {
-  name: 'gallery-player',
+  name: 'GalleryPlayer',
   components: {
+    AssetSpinner,
     VideoPlayer: vueVimeoPlayer
   },
   props: {
     selectedItem: {
       type: Object
+    },
+    loading: {
+      type: Boolean,
+      required: true,
+      default: true
     }
   },
   data () {
     return {
-      height: ((window.innerWidth * 1080 / 1980) * 0.8).toFixed(0),
-      options: {},
-      playerReady: false
+      options: {
+        title: true,
+        autoplay: false,
+        background: true,
+        transparent: false,
+        color: 0x330000
+      },
+      playerReady: false,
+      playerWidth: 0,
+      playerHeight: 0
     }
   },
   computed: {
-    videoURL () { return this.selectedItem.uri.split('/')[2] }
+    videoURL () { return this.selectedItem.uri.split('/')[2] },
+    height () {
+      let result = ((window.innerWidth * 1080 / 1980)).toFixed(0)
+      let heightLimit = window.innerHeight * 0.5
+      if (result > heightLimit) result = heightLimit
+      return result
+    },
+    width: () => window.innerWidth
+  },
+  created () {
+    window.addEventListener('resize', this.handleWindowResize)
+    this.handleWindowResize()
   },
   methods: {
-    onReady () { this.playerReady = true },
+    handleWindowResize () {
+      this.playerWidth = this.width
+      this.playerHeight = this.height
+    },
+    onLoaded () {
+      console.log('ON LOADED')
+      this.$emit(EVENT_LOADED)
+    },
+    onReady () {
+      console.log('PLAYER READY')
+      this.playerReady = true
+      this.$emit(EVENT_READY)
+    },
     play () { this.$refs.player.play() },
     stop () { this.$refs.player.stop() }
   }
@@ -42,8 +85,10 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.gallery-video-player {
+.gallery-player {
   width: 100%;
+  position: relative;
+
   .video-player {
     left: 50%;
     position:absolute;

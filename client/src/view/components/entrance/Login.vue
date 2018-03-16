@@ -4,7 +4,7 @@
       <div>Email:</div>
       <input type="text" v-model="name"><br>
       <div>Password:</div>
-      <input type="text" v-model="password"><br>
+      <input type="text" v-model="password" @keyup.enter="onLogin"><br>
       <button type="button" @click="onLogin" :disabled="!validated">Login</button>
     </form>
   </div>
@@ -36,6 +36,7 @@ export default {
     onLogin () {
       this.login(new AuthDTO(this.$data, UserAction.LOGIN))
         .then(result => {
+          console.log('isUserLoggedIn', this.isUserLoggedIn)
           switch (result) {
             case UserError.LOG_IN_FAILED:
               showError('LOGIN FAILED')
@@ -55,7 +56,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      'isUserLoggedIn': ApplicationGetter.USER_LOGGED_IN
+      'isUserLoggedIn': ApplicationGetter.IS_USER_LOGGED
     }),
     validated: function () {
       return this.password.length > 0 &&
@@ -65,6 +66,7 @@ export default {
   created () {
     showMessage = ConstructMessageToast(this.$toasted)
     showError = ConstructErrorToast(this.$toasted)
+    console.log('isUserLoggedIn', this.isUserLoggedIn)
   },
   data: function () {
     return {

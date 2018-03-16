@@ -1,27 +1,49 @@
 <template>
-  <div class="index-page">
-    <div :style="{ 'width': width + 'px', 'height': height + 'px', 'background-image': 'url(' + imageURL() + ')' }"/>
+  <div class="index-page" ref="ref_background" :style="{ 'width': width + 'px', 'height': height + 'px'}">
+    <AssetSpinner v-if="loading"/>
   </div>
 </template>
 
 <script>
 
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
+import ApplicationAction from '@/consts/actions/ApplicationAction'
+import LoadImageDTO from '@/model/dtos/LoadImageDTO'
+import AssetSpinner from '@/view/components/_common/loading/AssetSpinner'
 
 export default {
   name: 'IndexPage',
+  components: {
+    AssetSpinner
+  },
   computed: {
     ...mapState([
       'server'
     ])
   },
+  mounted () {
+    let url = `${this.server.imageAPI}/${this.width}x${this.height}`
+    this.loadImage(new LoadImageDTO(url, (progress) => {
+      console.log(progress)
+    })).then((imageURL) => {
+      if (imageURL) {
+        let back = this.$refs.ref_background
+        back && (back.style.backgroundImage = `url(${imageURL})`)
+      }
+      this.loading = false
+    })
+    window.addEventListener('resize', this.handleWindowResize)
+  },
   methods: {
-    imageURL () {
-      return `https://source.unsplash.com/${this.width}x${this.height}`
+    ...mapActions({ loadImage: ApplicationAction.LOAD_IMAGE }),
+    handleWindowResize () {
+      this.width = window.innerWidth
+      this.height = window.innerHeight
     }
   },
   data () {
     return {
+      loading: true,
       width: window.innerWidth,
       height: window.innerHeight
     }
@@ -31,36 +53,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
-  form {
-    text-align: center;
-    margin: 0 auto;
-    padding: 0 1rem;
-    max-width: 300px;
-    background: #fcfcfc;
-    border: 1px solid #f1f1f1;
-    div {
-      font-size: 0.88rem;
-      color: #666;
-      text-align: left;
-      margin-top: 1rem;
-      padding-left: 0.21rem;
-    }
-    input {
-      width: 100%;
-      height: 1.618rem;
-      font-size: 1rem;
-      text-indent: 0.34rem;
-      border-radius: 0.25rem;
-      border: 1px solid #dddddd;
-      outline: none;
-    }
-
-    button {
-      margin: 1rem 0 0.75rem 0;
-      border-radius: 5px;
-      height: 1.618rem;
-      font-weight: bold;
-    }
-  }
+.index-page {
+  background-size:     cover;
+  background-repeat:   no-repeat;
+  background-position: center center;
+}
 </style>

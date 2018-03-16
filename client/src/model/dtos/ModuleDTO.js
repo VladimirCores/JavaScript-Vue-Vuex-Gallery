@@ -1,6 +1,5 @@
 export default class ModuleDTO {
-  constructor (name, module) {
-    this.name = name
+  constructor (module) {
     this.module = module
   }
 }
