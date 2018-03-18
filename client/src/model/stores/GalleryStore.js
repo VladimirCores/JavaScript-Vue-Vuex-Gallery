@@ -8,8 +8,10 @@ import GetDataGalleryCommand from '@/controller/commands/gallery/GetGalleryDataC
 import NavigateGalleryCommand from '@/controller/commands/gallery/NavigateGalleryCommand'
 
 import {
-  GALLERY_STORE_NAME
+  GALLERY_STORE_NAME, USER_SETTINGS_STORE_NAME
 } from '@/consts/StoreNames'
+
+import Database, {Event as DatabaseEvent} from '@/model/Database'
 
 let _PRIVATE_GET_USER_SETTINGS = 'private_getter_get_user_settings'
 let _PRIVATE_GET_SERVER = 'private_getter_get_server'
@@ -19,8 +21,12 @@ export default {
   state: new GalleryVO(),
   strict: true,
   namespaced: true,
-  onRegister () {
+  onRegister (store) {
     console.log('> GalleryStore -> onRegister')
+    Database.addUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, (doc) => {
+      console.log('> GalleryStore -> DatabaseEvent.CHANGE:', doc)
+      store.dispatch(GalleryAction.SETUP_GALLERY_VIEW)
+    })
   },
   onRemove () {
     console.log('> GalleryStore -> onRemove')
@@ -36,9 +42,12 @@ export default {
       return GetDataGalleryCommand.execute(serverVO, userSettingsVO, galleryVO)
         .then(result => {
           console.log('> GalleryStore > GetGalleryDataCommand > result:', result)
-          store.commit(GalleryMutation.SETUP_GALLERY, galleryVO)
-          store.commit(GalleryMutation.UPDATE_GALLERY_VIEW, result)
-          store.dispatch(GalleryAction.SELECT_ITEM, 0)
+          let registered = store.getters[GalleryGetter.IS_GALLERY_REGISTERED]
+          if (registered) {
+            store.commit(GalleryMutation.SETUP_GALLERY, galleryVO)
+            store.commit(GalleryMutation.UPDATE_GALLERY_VIEW, result)
+            store.dispatch(GalleryAction.SELECT_ITEM, 0)
+          }
           return true
         }, (error) => {
           console.log('> GalleryStore > GetGalleryDataCommand > error:', error)
@@ -49,7 +58,6 @@ export default {
       let galleryItems = store.getters[GalleryGetter.GET_VIEW_ITEMS]
       if (galleryItems) {
         store.commit(GalleryMutation.SET_SELECTED_ITEM, galleryItems[payload])
-        // store.commit(GalleryMutation.SET_SELECTED_ITEM, null)
       }
     },
     [GalleryAction.NAVIGATE] (store, increment) {
@@ -75,6 +83,7 @@ export default {
     }
   },
   getters: {
+    [GalleryGetter.IS_GALLERY_REGISTERED]: (state, getters, rootState) => { return rootState.hasOwnProperty(GALLERY_STORE_NAME) },
     [GalleryGetter.IS_GALLERY_READY]: state => {
       let result = !!state && state.index > 0
       console.log('GalleryGetter.IS_GALLERY_READY = ' + result)

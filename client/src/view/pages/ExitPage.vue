@@ -20,7 +20,7 @@ export default {
     counter () {
       if (this.counterValue < 0) {
         clearInterval(counterID)
-        // this.$router.push({ name: this.navigateToPageName })
+        this.$router.push({ name: this.navigateToPageName })
       } else return this.counterValue
     }
   },

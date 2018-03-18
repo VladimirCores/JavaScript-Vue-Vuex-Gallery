@@ -62,9 +62,10 @@ export default new Vuex.Store({
       console.log('> ApplicationStore -> ApplicationAction.REGISTER_MODULE payload =', payload)
       if (payload && payload instanceof ModuleDTO) {
         let module = payload.module
+        let moduleName = module.name
         registeredModules.push(module)
-        this.registerModule(module.name, module)
-        module.onRegister && module.onRegister()
+        this.registerModule(moduleName, module)
+        module.onRegister && module.onRegister(this._modules.root.getChild(moduleName).context)
       }
     },
     [ApplicationAction.LOAD_IMAGE] (store, payload) {

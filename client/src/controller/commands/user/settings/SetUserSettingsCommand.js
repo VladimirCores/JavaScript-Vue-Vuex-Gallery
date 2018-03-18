@@ -12,19 +12,26 @@ class SetSettingsUserCommand {
   execute (input) {
     let userDB = Database.getUserInstance()
     console.log('> SetSettingsUserCommand -> input =', input)
-    return userDB.put(input)
-      .then((doc) => {
-        console.log('> SetSettingsUserCommand -> doc =', doc)
-        if (doc.ok) {
-          return Object.assign(input, { _rev: doc.rev })
-        } else {
-          return UserSettingsError.UPDATE_FAILED
-        }
-      })
-      .catch((error) => {
-        console.log('> SetSettingsUserCommand > error:', error)
-        return UserSettingsError.UPDATE_UNEXPECTED
-      })
+    return userDB.get('settings').then((doc) => {
+      if (doc.userID === input.userID &&
+          doc.accessToken === input.accessToken
+      ) return new Error(UserSettingsError.UPDATE_ALREADY_UPDATED)
+      else {
+        return userDB.put(Object.assign(doc, input))
+          .then((doc) => {
+            console.log('> SetSettingsUserCommand -> doc =', doc)
+            if (doc.ok) {
+              return doc
+            } else {
+              return UserSettingsError.UPDATE_FAILED
+            }
+          })
+          .catch((error) => {
+            console.log('> SetSettingsUserCommand > error:', error)
+            return UserSettingsError.UPDATE_UNEXPECTED
+          })
+      }
+    })
   }
 }
 

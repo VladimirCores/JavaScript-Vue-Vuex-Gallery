@@ -6,7 +6,7 @@
       <div>UserID:</div><input type="text" v-model="userID"><br>
       <div>Token:</div><input type="text" v-model="accessToken"><br>
 
-      <button type="button" @click="onAccept" :disabled="!validated || !changed">Accept</button>
+      <button type="button" @click="onAccept" :disabled="!validated && !changed">Accept</button>
     </form>
   </div>
 </template>
@@ -16,32 +16,29 @@ import {
   USER_STORE_NAME
 } from '@/consts/StoreNames'
 
-import UserSettingsAction from '@/consts/actions/UserSettingsAction'
+import UserSettingsAction from '@/consts/actions/user/UserSettingsAction'
+import UserSettingsMutation from '@/consts/mutations/user/UserSettingsMutation'
 import UserSettingsError from '@/consts/errors/UserSettingsError'
-import UserSettingsGetter from '@/consts/getters/user/UserSettingsGetter'
 
 import { createNamespacedHelpers } from 'vuex'
 
-const userMapGetters = createNamespacedHelpers(USER_STORE_NAME).mapGetters
-const mapUserSettingsActions = createNamespacedHelpers(USER_STORE_NAME).mapActions
+const mapUserState = createNamespacedHelpers(USER_STORE_NAME).mapState
+const mapUserActions = createNamespacedHelpers(USER_STORE_NAME).mapActions
 
 const EVENT_CLOSE = 'close'
-const EVENT_USER_CHANGED = 'userChange'
 
 export default {
   name: 'UserSettings',
   methods: {
-    ...mapUserSettingsActions({
-      changeUserSettingsData: UserSettingsAction.CHANGED
+    ...mapUserActions({
+      actionChangeUserSettings: UserSettingsAction.CHANGED
     }),
-    onClose () {
-      this.$emit(EVENT_CLOSE)
-    },
+    onClose () { this.$emit(EVENT_CLOSE) },
     onAccept () {
       this.validated = false
-      this.changeUserSettingsData({...this.$data})
+      this.actionChangeUserSettings({...this.$data})
         .then((result) => {
-          console.log('> UserSettings -> changeUserSettingsData : result = ' + result)
+          console.log('> UserSettings -> actionChangeUserSettings : result = ' + result)
           switch (result) {
             case UserSettingsError.UPDATE_FAILED:
               break
@@ -49,23 +46,33 @@ export default {
               break
           }
           this.validated = true
-          if (result === true) this.$emit(EVENT_USER_CHANGED)
         })
+    },
+    UpdateStoreValues (data) {
+      if (data.userID !== this.userID) this.userID = data.userID
+      if (data.accessToken !== this.accessToken) this.accessToken = data.accessToken
     }
   },
   computed: {
-    ...userMapGetters({
-      user_id: UserSettingsGetter.GET_USER_ID,
-      access_token: UserSettingsGetter.GET_TOKEN
-    }),
+    ...mapUserState(['settings']),
     changed: function () {
-      return this.user_id !== this.userID ||
-        this.access_token !== this.accessToken
+      return this.settings.userID !== this.userID ||
+        this.settings.accessToken !== this.accessToken
+    }
+  },
+  watch: {
+    settings: function (val) {
+      console.log('> UserSettings -> watcher:', val)
     }
   },
   created () {
-    this.userID = this.user_id
-    this.accessToken = this.access_token
+    this.UpdateStoreValues(this.settings)
+    this.$store.subscribe((mutation, state) => {
+      if (mutation.type.indexOf(UserSettingsMutation.SETUP_SETTINGS) > -1) {
+        console.log('> UserSettings -> subscribe: catch update', mutation)
+        this.UpdateStoreValues(mutation.payload)
+      }
+    })
   },
   data: function () {
     return {

@@ -4,7 +4,8 @@ import UserMutation from '@/consts/mutations/UserMutation'
 import UserGetter from '@/consts/getters/UserGetter'
 
 import UserSettingsStore from '@/model/stores/user/UserSettingsStore'
-import UserSettingsAction from '@/consts/actions/UserSettingsAction'
+import UserSettingsAction from '@/consts/actions/user/UserSettingsAction'
+import UserSettingsMutation from '@/consts/mutations/user/UserSettingsMutation'
 
 import SignUpUserCommand from '@/controller/commands/user/SignUpUserCommand'
 import LoginUserCommand from '@/controller/commands/user/LoginUserCommand'
@@ -16,6 +17,8 @@ import {
   USER_SETTINGS_STORE_NAME
 } from '@/consts/StoreNames'
 
+import Database, { Event as DatabaseEvent } from '@/model/Database'
+
 const UserStore = {
   name: USER_STORE_NAME,
   state: {},
@@ -24,8 +27,12 @@ const UserStore = {
   modules: {
     [USER_SETTINGS_STORE_NAME]: UserSettingsStore
   },
-  onRegister () {
+  onRegister (store) {
     console.log('> UserStore -> onRegister')
+    Database.addUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, (doc) => {
+      console.log('> UserStore -> DatabaseEvent.CHANGE:', doc, store)
+      store.commit(UserSettingsMutation.SETUP_SETTINGS, doc)
+    })
   },
   onRemove () {
     console.log('> UserStore -> onRemove')

@@ -1,5 +1,5 @@
 import UserSettingsVO from '@/model/vos/user/UserSettingsVO'
-import UserSettingsAction from '@/consts/actions/UserSettingsAction'
+import UserSettingsAction from '@/consts/actions/user/UserSettingsAction'
 
 import UserSettingsMutation from '@/consts/mutations/user/UserSettingsMutation'
 import UserSettingsGetter from '@/consts/getters/user/UserSettingsGetter'
@@ -20,8 +20,7 @@ const UserSettingsStore = {
     },
     [UserSettingsAction.CHANGED]: (store, payload) => {
       console.log('> UserSettingsStore -> UserSettingsAction.CHANGED : payload =', payload)
-      let newState = Object.assign(Object.assign({}, store.state), payload)
-      return SetSettingsUserCommand.execute(newState).then((result) => {
+      return SetSettingsUserCommand.execute(payload).then((result) => {
         console.log('> UserSettingsStore -> UserSettingsAction.CHANGED : result =', result)
         if (Number.isInteger(result)) return result // Error occurs
         else {
@@ -33,7 +32,7 @@ const UserSettingsStore = {
     }
   },
   getters: {
-    [UserSettingsGetter.GET_USER_ID] (state) { return state.userID },
+    [UserSettingsGetter.GET_USER_ID] (state) { return state ? state.userID : null },
     [UserSettingsGetter.GET_TOKEN] (state) { return state.accessToken }
   },
   mutations: {

@@ -2,14 +2,21 @@ import PouchDB from 'pouchdb'
 import PouchAuth from 'pouchdb-authentication'
 PouchDB.plugin(PouchAuth)
 
+const DB_URL = 'http://localhost:5984/'
+const DB_USER = 'userdb'
+
+const EVENT_DB_CHANGE = 'change'
+const EVENT_DB_COMPLETE = 'complete'
+
 /* eslint no-new-symbol: 2 */
 /* eslint-env es6 */
 let _applicationDB = null
 let _applicationLocalDB = null
 let _userDB = null
-let _pendingResolve = null
-
-const DB_URL = 'http://localhost:5984/'
+let _callbacks = {
+  [EVENT_DB_CHANGE]: new Map([[DB_USER, new Map()]]),
+  [EVENT_DB_COMPLETE]: new Map()
+}
 
 function _convertToHex (str) {
   let hex = ''
@@ -22,9 +29,7 @@ function _convertToHex (str) {
 
 PouchDB.on('created', function (dbName) {
   console.log('> Database -> DB_CREATED: dbName = ' + dbName)
-  if (_userDB && _userDB.name === dbName && _pendingResolve) {
-    _pendingResolve()
-    _pendingResolve = null
+  if (_userDB && _userDB.name === dbName) {
   }
 })
 
@@ -34,6 +39,31 @@ class Database {
     _applicationDB = new PouchDB(`${DB_URL}${path}`, {skip_setup: true})
     _applicationLocalDB = new PouchDB(path)
     _applicationLocalDB.sync(_applicationDB, {live: true, retry: true})
+    _applicationDB
+      .on(EVENT_DB_CHANGE, (event) => {
+        // handle change
+        console.log('> Database -> applicationDB - change:', event)
+      })
+      .on('paused', (err) => {
+        // replication paused (e.g. replication up to date, user went offline)
+        console.log('> Database -> applicationDB - paused:', err)
+      })
+      .on('active', () => {
+        // replicate resumed (e.g. new changes replicating, user went back online)
+        console.log('> Database -> applicationDB - active')
+      })
+      .on('denied', (err) => {
+        // a document failed to replicate (e.g. due to permissions)
+        console.log('> Database -> applicationDB - denied:', err)
+      })
+      .on('complete', function (info) {
+        // handle complete
+        console.log('> Database -> applicationDB - complete:', info)
+      })
+      .on('error', (err) => {
+        // handle error
+        console.log('> Database -> applicationDB - error:', err)
+      })
     return this
   }
 
@@ -46,9 +76,8 @@ class Database {
     console.log('> Database -> configureForUser: username = ' + username)
     console.log('> Database -> configureForUser: password = ' + password)
     let promise = new Promise((resolve) => {
-      _pendingResolve = resolve
-      _userDB = new PouchDB('userdb')
-      _userDB.sync(new PouchDB(`${DB_URL}/userdb-${_convertToHex(username).toLowerCase()}`, {
+      _userDB = new PouchDB(DB_USER)
+      _userDB.sync(new PouchDB(`${DB_URL}/${DB_USER}-${_convertToHex(username).toLowerCase()}`, {
         auth: {
           username: username,
           password: password
@@ -58,9 +87,21 @@ class Database {
         live: true,
         retry: true
       })
-        .on('change', (change) => {
+        .on(EVENT_DB_CHANGE, (event) => {
           // handle change
-          console.log('> Database -> userDB - change:', change)
+          console.log('> Database -> userDB - change:', event)
+          let change = event.change
+          if (change.ok) {
+            let docs = change.docs
+            let interestsMap = _callbacks[EVENT_DB_CHANGE].get(DB_USER)
+            docs.forEach(doc => {
+              let interestID = doc._id
+              if (interestsMap.has(interestID)) {
+                let callbacks = interestsMap.get(interestID)
+                callbacks.forEach(callback => callback(doc))
+              }
+            })
+          }
         })
         .on('paused', (err) => {
           // replication paused (e.g. replication up to date, user went offline)
@@ -95,7 +136,20 @@ class Database {
         return response ? response.userCtx.name : null // response.userCtx.name is the current user
       })
   }
+  addUserEventListener (eventName, interestId, callback) {
+    let event = _callbacks[eventName]
+    if (event) {
+      let userInterestsMap = event.get(DB_USER)
+      if (!userInterestsMap.has(interestId)) userInterestsMap.set(interestId, [])
+      let callbacks = userInterestsMap.get(interestId)
+      callbacks.push(callback)
+    }
+  }
 }
 
 const DB = new Database()
 export default DB
+
+export const Event = {
+  CHANGE: EVENT_DB_CHANGE
+}

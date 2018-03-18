@@ -2,11 +2,7 @@
   <div id="gallery-page">
 
     <transition name="component-fade" mode="out-in">
-      <component v-bind:is="userSettingsForm"
-        @close="OnCloseUserSettings"
-        @userChange="OnUserChanged"
-      >
-      </component>
+      <component v-bind:is="userSettingsForm" @close="OnCloseUserSettings"/>
     </transition>
 
     <GalleryPlayer
@@ -26,7 +22,7 @@
        :selectedItem="selectedItem"
     />
     <Spinner v-else></Spinner>
-    <div class="icon_settings" @click="openUserSettingsForm"/>
+    <div class="icon_settings" @click="OnOpenUserSettingsForm"/>
   </div>
 </template>
 
@@ -50,7 +46,7 @@ import GalleryView from '@/view/components/gallery/GalleryView'
 import GalleryPlayer from '@/view/components/gallery/GalleryPlayer'
 import GalleryNavigation from '@/view/components/gallery/GalleryNavigation'
 
-import { createNamespacedHelpers } from 'vuex'
+import { createNamespacedHelpers, mapState } from 'vuex'
 
 import {
   ConstructErrorToast
@@ -73,6 +69,7 @@ export default {
     GalleryNavigation
   },
   computed: {
+    ...mapState(['logged']),
     ...galleryMapState(['selectedItem']),
     ...galleryMapGetters({ isGalleryReady: GalleryGetter.IS_GALLERY_READY })
   },
@@ -100,9 +97,8 @@ export default {
       actionNavigateTo: GalleryAction.NAVIGATE,
       actionSetupGalleryView: GalleryAction.SETUP_GALLERY_VIEW
     }),
-    OnUserChanged () { this.setup() },
     OnCloseUserSettings () { this.userSettingsForm = '' },
-    openUserSettingsForm () { this.userSettingsForm = () => import('@/view/components/index/UserSettings') },
+    OnOpenUserSettingsForm () { this.userSettingsForm = () => import('@/view/components/settings/UserSettings') },
     setup () {
       this.actionSetupGalleryView().then(status => {
         switch (status) {
@@ -125,7 +121,7 @@ export default {
     this.$store.dispatch(ApplicationAction.REGISTER_MODULE, new ModuleDTO(GalleryStore))
   },
   beforeDestroy () {
-    this.$store.dispatch(ApplicationAction.DEREGISTER_MODULE, GalleryStore)
+    if (this.logged) this.$store.dispatch(ApplicationAction.DEREGISTER_MODULE, GalleryStore)
   },
   created () { this.setup() },
   data () {

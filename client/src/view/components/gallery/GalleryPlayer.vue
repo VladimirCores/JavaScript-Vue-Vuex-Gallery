@@ -55,6 +55,7 @@ export default {
     height () {
       let result = ((window.innerWidth * 1080 / 1980)).toFixed(0)
       let heightLimit = window.innerHeight * 0.5
+      if (heightLimit < 360) heightLimit = 360
       if (result > heightLimit) result = heightLimit
       return result
     },

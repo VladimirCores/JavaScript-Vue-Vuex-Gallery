@@ -11,8 +11,8 @@ import UserError from '@/consts/errors/UserError'
 */
 class LogoutUserCommand {
   execute () {
-    let db = Database.getApplicationInstance()
-    return db.logOut().then((response) => { // response {"ok":true}
+    let appDB = Database.getApplicationInstance()
+    return appDB.logOut().then((response) => { // response {"ok":true}
       console.log('> LogoutUserCommand > logOut: response =', response)
       return response.ok || UserError.LOG_OUT_UNEXPECTED
     }).catch(() => UserError.LOG_OUT_FAILED) // network error
