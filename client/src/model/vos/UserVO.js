@@ -9,5 +9,6 @@ export default class UserVO {
     this.firstName = ''
     this.email = ''
     this.token = ''
+    this.logged = false
   }
 }

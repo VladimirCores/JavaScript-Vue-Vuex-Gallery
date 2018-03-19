@@ -15,7 +15,8 @@ class SignUpUserCommand {
     let metadata = {
       email: name,
       firstName: firstName,
-      lastName: lastName
+      lastName: lastName,
+      logged: false
     }
     return db
       .signUp(name, password, { metadata })

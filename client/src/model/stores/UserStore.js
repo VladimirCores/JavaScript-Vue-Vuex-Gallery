@@ -5,7 +5,6 @@ import UserGetter from '@/consts/getters/UserGetter'
 
 import UserSettingsStore from '@/model/stores/user/UserSettingsStore'
 import UserSettingsAction from '@/consts/actions/user/UserSettingsAction'
-import UserSettingsMutation from '@/consts/mutations/user/UserSettingsMutation'
 
 import SignUpUserCommand from '@/controller/commands/user/SignUpUserCommand'
 import LoginUserCommand from '@/controller/commands/user/LoginUserCommand'
@@ -17,8 +16,6 @@ import {
   USER_SETTINGS_STORE_NAME
 } from '@/consts/StoreNames'
 
-import Database, { Event as DatabaseEvent } from '@/model/Database'
-
 const UserStore = {
   name: USER_STORE_NAME,
   state: {},
@@ -29,10 +26,7 @@ const UserStore = {
   },
   onRegister (store) {
     console.log('> UserStore -> onRegister')
-    Database.addUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, (doc) => {
-      console.log('> UserStore -> DatabaseEvent.CHANGE:', doc, store)
-      store.commit(UserSettingsMutation.SETUP_SETTINGS, doc)
-    })
+    UserSettingsStore.onRegister(store)
   },
   onRemove () {
     console.log('> UserStore -> onRemove')
@@ -61,7 +55,7 @@ const UserStore = {
     },
     [UserAction.LOGOUT]: (store) => {
       console.log('> UserStore -> UserAction.LOGOUT')
-      return LogoutUserCommand.execute().then((result) => {
+      return LogoutUserCommand.execute(store.state).then((result) => {
         console.log('> UserStore -> UserAction.LOGOUT : result = ', result)
         store.commit(UserMutation.LOG_OUT_USER)
         return result

@@ -7,10 +7,26 @@ import UserSettingsGetter from '@/consts/getters/user/UserSettingsGetter'
 import SetSettingsUserCommand from '@/controller/commands/user/settings/SetUserSettingsCommand'
 import GetSettingsUserCommand from '@/controller/commands/user/settings/GetUserSettingsCommand'
 
+import {
+  USER_SETTINGS_STORE_NAME
+} from '@/consts/StoreNames'
+
+import Database, { Event as DatabaseEvent } from '@/model/Database'
+
 const UserSettingsStore = {
+  name: USER_SETTINGS_STORE_NAME,
   state: new UserSettingsVO(),
   strict: true,
   namespaced: false,
+  onRegister (store) {
+    console.log('> UserSettingsStore -> onRegister')
+    Database.addUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, (doc) => {
+      console.log('> UserSettingsStore -> DatabaseEvent.CHANGE:', doc, store)
+      store.commit(UserSettingsMutation.SETUP_SETTINGS, doc)
+    })
+  },
+  onRemove (store) {
+  },
   actions: {
     [UserSettingsAction.CONFIG]: (store, payload) => {
       console.log('> UserSettingsStore -> UserSettingsAction.LOGIN : payload =', payload)
@@ -25,7 +41,6 @@ const UserSettingsStore = {
         if (Number.isInteger(result)) return result // Error occurs
         else {
           let userChanged = store.state.userID !== result.userID
-          store.commit(UserSettingsMutation.SETUP_SETTINGS, result)
           return userChanged
         }
       })
@@ -33,7 +48,7 @@ const UserSettingsStore = {
   },
   getters: {
     [UserSettingsGetter.GET_USER_ID] (state) { return state ? state.userID : null },
-    [UserSettingsGetter.GET_TOKEN] (state) { return state.accessToken }
+    [UserSettingsGetter.GET_ACCESS_TOKEN] (state) { return state.accessToken }
   },
   mutations: {
     [UserSettingsMutation.SETUP_SETTINGS]: (state, payload) => {

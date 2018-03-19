@@ -14,7 +14,16 @@ class LoginUserCommand {
         if (response.ok) {
           return db.getUser(name).then((response) => {
             console.log('> LoginUserCommand > getUser: response =', response)
-            return response
+            response.logged = true
+            return db.putUser(name, { metadata: { logged: true } })
+              .then((status) => {
+                console.log('> LoginUserCommand > putUser: status =', status)
+                return response
+              })
+              .catch((error) => {
+                console.log('> LoginUserCommand > putUser error =', error)
+                return response
+              })
           })
         } else return UserError.LOG_IN_FAILED
       })

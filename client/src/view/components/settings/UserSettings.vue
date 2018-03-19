@@ -5,8 +5,10 @@
 
       <div>UserID:</div><input type="text" v-model="userID"><br>
       <div>Token:</div><input type="text" v-model="accessToken"><br>
+      <!--<div>UserID:</div><input type="text" :value="settings.userID" @change="onUserIDChanged"><br>-->
+      <!--<div>Token:</div><input type="text" :value="settings.accessToken" @change="onTokenChanged"><br>-->
 
-      <button type="button" @click="onAccept" :disabled="!validated && !changed">Accept</button>
+      <button type="button" @click="onAccept" :disabled="!isDataChanged || isProcessing">Accept</button>
     </form>
   </div>
 </template>
@@ -17,15 +19,19 @@ import {
 } from '@/consts/StoreNames'
 
 import UserSettingsAction from '@/consts/actions/user/UserSettingsAction'
-import UserSettingsMutation from '@/consts/mutations/user/UserSettingsMutation'
 import UserSettingsError from '@/consts/errors/UserSettingsError'
+import UserSettingsMutation from '@/consts/mutations/user/UserSettingsMutation'
+import UserSettingsGetters from '@/consts/getters/user/UserSettingsGetter'
 
 import { createNamespacedHelpers } from 'vuex'
 
-const mapUserState = createNamespacedHelpers(USER_STORE_NAME).mapState
+// const mapUserState = createNamespacedHelpers(USER_STORE_NAME).mapState
 const mapUserActions = createNamespacedHelpers(USER_STORE_NAME).mapActions
+const mapUserGetters = createNamespacedHelpers(USER_STORE_NAME).mapGetters
 
 const EVENT_CLOSE = 'close'
+
+let _isProcessing = false
 
 export default {
   name: 'UserSettings',
@@ -33,9 +39,11 @@ export default {
     ...mapUserActions({
       actionChangeUserSettings: UserSettingsAction.CHANGED
     }),
+    // onUserIDChanged (event) { this.userID = event.target.value },
+    // onTokenChanged (event) { this.accessToken = event.target.value },
     onClose () { this.$emit(EVENT_CLOSE) },
     onAccept () {
-      this.validated = false
+      _isProcessing = true
       this.actionChangeUserSettings({...this.$data})
         .then((result) => {
           console.log('> UserSettings -> actionChangeUserSettings : result = ' + result)
@@ -45,40 +53,43 @@ export default {
             case UserSettingsError.UPDATE_UNEXPECTED:
               break
           }
-          this.validated = true
+          _isProcessing = false
         })
     },
-    UpdateStoreValues (data) {
-      if (data.userID !== this.userID) this.userID = data.userID
-      if (data.accessToken !== this.accessToken) this.accessToken = data.accessToken
+    UpdateStoreValues () {
+      this.userID = this.getUserID
+      this.accessToken = this.getAccessToken
     }
   },
   computed: {
-    ...mapUserState(['settings']),
-    changed: function () {
-      return this.settings.userID !== this.userID ||
-        this.settings.accessToken !== this.accessToken
-    }
-  },
-  watch: {
-    settings: function (val) {
-      console.log('> UserSettings -> watcher:', val)
+    ...mapUserGetters({
+      getUserID: UserSettingsGetters.GET_USER_ID,
+      getAccessToken: UserSettingsGetters.GET_ACCESS_TOKEN
+    }),
+    // ...mapUserState(['settings']),
+    isProcessing: function () { return _isProcessing },
+    isDataChanged: function () {
+      return this.userID !== this.getUserID ||
+        this.accessToken !== this.getAccessToken
+      // return this.settings.userID !== this.userID ||
+      //   this.settings.accessToken !== this.accessToken
     }
   },
   created () {
-    this.UpdateStoreValues(this.settings)
-    this.$store.subscribe((mutation, state) => {
+    // this.UpdateStoreValues(this.settings)
+    this.UpdateStoreValues()
+    this.$store.subscribe((mutation) => {
       if (mutation.type.indexOf(UserSettingsMutation.SETUP_SETTINGS) > -1) {
         console.log('> UserSettings -> subscribe: catch update', mutation)
-        this.UpdateStoreValues(mutation.payload)
+        // this.UpdateStoreValues(mutation.payload)
+        this.UpdateStoreValues()
       }
     })
   },
   data: function () {
     return {
       userID: '',
-      accessToken: '',
-      validated: true
+      accessToken: ''
     }
   }
 }
