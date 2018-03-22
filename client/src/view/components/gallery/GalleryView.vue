@@ -20,7 +20,7 @@ import GalleryViewItem from '@/view/components/gallery/GalleryViewItem'
 import { GALLERY_STORE_NAME } from '@/consts/StoreNames'
 import {
   IS_GALLERY_READY,
-  GET_VIEW_ITEMS
+  GET_GALLERY_VIEW_ITEMS
 } from '@/consts/getters/GalleryGetter'
 
 const { mapGetters } = createNamespacedHelpers(GALLERY_STORE_NAME)
@@ -43,7 +43,7 @@ export default
   computed: {
     ...mapGetters({
       ready: IS_GALLERY_READY,
-      items: GET_VIEW_ITEMS
+      items: GET_GALLERY_VIEW_ITEMS
     })
   }
 }

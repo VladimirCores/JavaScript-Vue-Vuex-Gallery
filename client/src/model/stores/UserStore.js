@@ -19,7 +19,7 @@ import {
 const UserStore = {
   name: USER_STORE_NAME,
   state: {},
-  strict: true,
+  strict: process.env.NODE_ENV !== 'production',
   namespaced: true,
   modules: {
     [USER_SETTINGS_STORE_NAME]: UserSettingsStore

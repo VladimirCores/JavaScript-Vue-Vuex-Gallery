@@ -16,7 +16,7 @@ import Database, { Event as DatabaseEvent } from '@/model/Database'
 const UserSettingsStore = {
   name: USER_SETTINGS_STORE_NAME,
   state: new UserSettingsVO(),
-  strict: true,
+  strict: process.env.NODE_ENV !== 'production',
   namespaced: false,
   onRegister (store) {
     console.log('> UserSettingsStore -> onRegister')

@@ -19,7 +19,7 @@ let _PRIVATE_GET_SERVER = 'private_getter_get_server'
 export default {
   name: GALLERY_STORE_NAME,
   state: new GalleryVO(),
-  strict: true,
+  strict: process.env.NODE_ENV !== 'production',
   namespaced: true,
   onRegister (store) {
     console.log('> GalleryStore -> onRegister')
@@ -55,7 +55,7 @@ export default {
         })
     },
     [GalleryAction.SELECT_ITEM] (store, payload) {
-      let galleryItems = store.getters[GalleryGetter.GET_VIEW_ITEMS]
+      let galleryItems = store.getters[GalleryGetter.GET_GALLERY_VIEW_ITEMS]
       if (galleryItems) {
         store.commit(GalleryMutation.SET_SELECTED_ITEM, galleryItems[payload])
       }
@@ -89,8 +89,8 @@ export default {
       console.log('GalleryGetter.IS_GALLERY_READY = ' + result)
       return result
     },
-    [GalleryGetter.GET_VIEW_ITEMS]: state => { return (state && state.view != null) ? state.view.items : null },
-    [GalleryGetter.GET_VIEW_INDEX]: state => { return !!state && state.index ? state.index : 0 },
+    [GalleryGetter.GET_GALLERY_VIEW_ITEMS]: state => { return (state && state.view != null) ? state.view.items : null },
+    [GalleryGetter.GET_GALLERY_VIEW_INDEX]: state => { return !!state && state.index ? state.index : 0 },
     [GalleryGetter.IS_NAVIGATE_POSSIBLE_PREV]: state => { return !!state && state.view && state.index > 1 },
     [GalleryGetter.IS_NAVIGATE_POSSIBLE_NEXT]: state => { return !!state && state.view && state.index < state.view.limit },
     [_PRIVATE_GET_USER_SETTINGS]: (state, getters, root) => { return root.user ? root.user.settings : null },
