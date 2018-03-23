@@ -140,9 +140,24 @@ class Database {
     let event = _callbacks[eventName]
     if (event) {
       let userInterestsMap = event.get(DB_USER)
-      if (!userInterestsMap.has(interestId)) userInterestsMap.set(interestId, [])
-      let callbacks = userInterestsMap.get(interestId)
-      callbacks.push(callback)
+      if (!userInterestsMap.has(interestId)) userInterestsMap.set(interestId, new Map())
+      let callbacksMap = userInterestsMap.get(interestId)
+      let listenerID = Date.now()
+      callbacksMap.set(listenerID, callback)
+      console.log('> Database -> addUserEventListener: eventName | interestId =', eventName, interestId, callbacksMap.keys())
+      return listenerID
+    }
+  }
+  removeUserEventListener (eventName, interestId, listenerID) {
+    let event = _callbacks[eventName]
+    if (event) {
+      let userInterestsMap = event.get(DB_USER)
+      if (userInterestsMap.has(interestId)) {
+        let callbacksMap = userInterestsMap.get(interestId)
+        if (!callbacksMap) return
+        callbacksMap.delete(listenerID)
+        console.log('> Database -> removeUserEventListener: eventName | interestId =', eventName, interestId, callbacksMap.keys())
+      }
     }
   }
 }

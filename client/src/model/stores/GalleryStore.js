@@ -16,6 +16,8 @@ import Database, {Event as DatabaseEvent} from '@/model/Database'
 let _PRIVATE_GET_USER_SETTINGS = 'private_getter_get_user_settings'
 let _PRIVATE_GET_SERVER = 'private_getter_get_server'
 
+let changeListenerID = 0
+
 export default {
   name: GALLERY_STORE_NAME,
   state: new GalleryVO(),
@@ -23,14 +25,14 @@ export default {
   namespaced: true,
   onRegister (store) {
     console.log('> GalleryStore -> onRegister')
-    Database.addUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, (doc) => {
+    changeListenerID = Database.addUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, (doc) => {
       console.log('> GalleryStore -> DatabaseEvent.CHANGE:', doc)
       store.dispatch(GalleryAction.SETUP_GALLERY_VIEW)
     })
   },
-  onRemove () {
+  onRemove (store) {
     console.log('> GalleryStore -> onRemove')
-    this.mutations[GalleryMutation.DESTROY]()
+    Database.removeUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, changeListenerID)
   },
   actions: {
     [GalleryAction.SETUP_GALLERY_VIEW] (store) {
@@ -97,7 +99,6 @@ export default {
     [_PRIVATE_GET_SERVER]: (state, getters, root) => { return root.server }
   },
   mutations: {
-    [GalleryMutation.DESTROY]: (state) => { for (let key in state) delete state[key] },
     [GalleryMutation.SETUP_GALLERY]: (state, payload) => { Object.assign(state, payload) },
     [GalleryMutation.SET_SELECTED_ITEM]: (state, payload) => { state.selectedItem = payload },
     [GalleryMutation.UPDATE_GALLERY_VIEW]: (state, payload) => { state.view = payload },

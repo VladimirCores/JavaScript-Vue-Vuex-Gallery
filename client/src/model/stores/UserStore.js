@@ -28,8 +28,9 @@ const UserStore = {
     console.log('> UserStore -> onRegister')
     UserSettingsStore.onRegister(store)
   },
-  onRemove () {
+  onRemove (store) {
     console.log('> UserStore -> onRemove')
+    UserSettingsStore.onRemove(store)
   },
   actions: {
     [UserAction.SIGNUP]: (store, payload) => {

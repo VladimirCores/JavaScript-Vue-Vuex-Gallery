@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 
 import PageNames from '@/consts/PageNames'
 import IndexPage from '@/view/pages/IndexPage'
+import NotFoundPage from '@/view/pages/NotFoundPage'
 
 import Database from '@/model/Database'
 
@@ -42,7 +43,8 @@ const Router = new VueRouter({
       name: PageNames.EXIT,
       component: () => import('@/view/pages/ExitPage'),
       beforeEnter (to, from, next) { isAuthorized(next, PageNames.INDEX) }
-    }
+    },
+    { path: '*', component: NotFoundPage }
   ],
   mode: 'history'
 })

@@ -9,6 +9,8 @@ export const USER_DATA_UPDATE = 'mutation_application_update_user_data'
 
 export const SET_BACKGROUND_IMAGE = 'mutation_application_set_background_image'
 
+export const DESTROY_MODULE = 'mutation_application_destroy_module_state'
+
 export default {
   SET_APPLICATION_IS_READY,
 
@@ -17,5 +19,6 @@ export default {
 
   USER_DATA_SETUP,
   USER_DATA_UPDATE,
-  SET_USER_LOGGED
+  SET_USER_LOGGED,
+  DESTROY_MODULE
 }

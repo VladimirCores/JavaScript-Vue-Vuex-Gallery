@@ -13,6 +13,8 @@ import {
 
 import Database, { Event as DatabaseEvent } from '@/model/Database'
 
+let changeListenerID = 0
+
 const UserSettingsStore = {
   name: USER_SETTINGS_STORE_NAME,
   state: new UserSettingsVO(),
@@ -20,12 +22,14 @@ const UserSettingsStore = {
   namespaced: false,
   onRegister (store) {
     console.log('> UserSettingsStore -> onRegister')
-    Database.addUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, (doc) => {
+    changeListenerID = Database.addUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, (doc) => {
       console.log('> UserSettingsStore -> DatabaseEvent.CHANGE:', doc, store)
       store.commit(UserSettingsMutation.SETUP_SETTINGS, doc)
     })
   },
   onRemove (store) {
+    console.log('> UserSettingsStore -> onRemove')
+    Database.removeUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, changeListenerID)
   },
   actions: {
     [UserSettingsAction.CONFIG]: (store, payload) => {
@@ -48,7 +52,7 @@ const UserSettingsStore = {
   },
   getters: {
     [UserSettingsGetter.GET_USER_ID] (state) { return state ? state.userID : null },
-    [UserSettingsGetter.GET_ACCESS_TOKEN] (state) { return state.accessToken }
+    [UserSettingsGetter.GET_ACCESS_TOKEN] (state) { return state ? state.accessToken : null }
   },
   mutations: {
     [UserSettingsMutation.SETUP_SETTINGS]: (state, payload) => {

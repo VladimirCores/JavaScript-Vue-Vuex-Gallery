@@ -23,7 +23,8 @@ import {
   SET_BACKGROUND_IMAGE,
   SERVER_DATA_UPDATE,
   SERVER_DATA_SETUP,
-  SET_USER_LOGGED
+  SET_USER_LOGGED,
+  DESTROY_MODULE
 } from '@/consts/mutations/ApplicationMutation'
 
 import UserAction from '@/consts/actions/UserAction'
@@ -55,8 +56,14 @@ export default new Vuex.Store({
       })
     },
     [ApplicationAction.DEREGISTER_MODULE] (store, payload) {
-      this.unregisterModule(payload.name)
-      payload.onRemove && payload.onRemove()
+      let moduleName = payload.name
+      let module = this._modules.root.getChild(moduleName)
+      let moduleContext = module.context
+      registeredModules.splice(registeredModules.indexOf(payload), 1)
+      console.log('> ApplicationStore -> ApplicationAction.DEREGISTER_MODULE payload =', module)
+      payload.onRemove && payload.onRemove(moduleContext)
+      this.unregisterModule(moduleName)
+      this.commit(DESTROY_MODULE, moduleName)
     },
     [ApplicationAction.REGISTER_MODULE] (store, payload) {
       console.log('> ApplicationStore -> ApplicationAction.REGISTER_MODULE payload =', payload)
@@ -78,9 +85,10 @@ export default new Vuex.Store({
       console.log('> ApplicationStore -> ApplicationAction.EXIT payload =', payload)
       this.dispatch(USER_STORE_NAME + '/' + UserAction.LOGOUT).then((result) => {
         store.commit(SET_USER_LOGGED, false)
-        while (registeredModules.length) {
-          let module = registeredModules.shift()
-          console.log('> ApplicationStore -> ApplicationAction.EXIT unregisterModule =', module.name)
+        let counter = registeredModules.length
+        while (counter--) {
+          let module = registeredModules[counter]
+          console.log('> ApplicationStore -> ApplicationAction.EXIT unregisterModule =', module)
           store.dispatch(ApplicationAction.DEREGISTER_MODULE, module)
         }
       })
@@ -93,6 +101,7 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    [DESTROY_MODULE]: (state, payload) => { },
     [SET_USER_LOGGED]: (state, payload) => { state.logged = payload },
     [SET_BACKGROUND_IMAGE]: (state, payload) => { state.backgroundImage = payload },
     [SET_APPLICATION_IS_READY]: (state, payload) => { state.isReady = payload },

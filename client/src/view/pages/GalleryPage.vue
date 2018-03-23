@@ -46,7 +46,7 @@ import GalleryView from '@/view/components/gallery/GalleryView'
 import GalleryPlayer from '@/view/components/gallery/GalleryPlayer'
 import GalleryNavigation from '@/view/components/gallery/GalleryNavigation'
 
-import { createNamespacedHelpers, mapState } from 'vuex'
+import { createNamespacedHelpers } from 'vuex'
 
 import {
   ConstructErrorToast
@@ -69,7 +69,6 @@ export default {
     GalleryNavigation
   },
   computed: {
-    ...mapState(['logged']),
     ...galleryMapState(['selectedItem']),
     ...galleryMapGetters({ isGalleryReady: GalleryGetter.IS_GALLERY_READY })
   },
@@ -121,7 +120,7 @@ export default {
     this.$store.dispatch(ApplicationAction.REGISTER_MODULE, new ModuleDTO(GalleryStore))
   },
   beforeDestroy () {
-    if (this.logged) this.$store.dispatch(ApplicationAction.DEREGISTER_MODULE, GalleryStore)
+    this.$store.dispatch(ApplicationAction.DEREGISTER_MODULE, GalleryStore)
   },
   created () { this.setup() },
   data () {

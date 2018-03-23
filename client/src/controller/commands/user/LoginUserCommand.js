@@ -29,12 +29,10 @@ class LoginUserCommand {
       })
       .catch((error) => {
         console.log('> LoginUserCommand > logIn: error =', error)
-        if (error) {
-          if (error.name === 'unauthorized' || error.name === 'forbidden') {
-            return UserError.LOG_IN_BAD_CREDITS // name or password incorrect
-          } else {
-            return UserError.LOG_IN_UNEXPECTED // cosmic rays, a meteor, etc.
-          }
+        if (error.name === 'unauthorized' || error.name === 'forbidden') {
+          return UserError.LOG_IN_BAD_CREDITS // name or password incorrect
+        } else {
+          return UserError.LOG_IN_UNEXPECTED // cosmic rays, a meteor, etc.
         }
       })
   }
