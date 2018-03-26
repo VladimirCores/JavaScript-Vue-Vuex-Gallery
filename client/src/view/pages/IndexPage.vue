@@ -22,7 +22,7 @@ export default {
     ])
   },
   mounted () {
-    let url = `${this.server.imageAPI}/${this.width}x${this.height}`
+    let url = `${this.server.imageAPI}/${Math.floor(this.height * 1.77)}x${this.height}`
     this.loadImage(new LoadImageDTO(url, (progress) => {
       console.log(progress)
     })).then((imageURL) => {
