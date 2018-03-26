@@ -54,6 +54,11 @@ class Database {
     _applicationDB = new PouchDB(`${DB_URL}${DB_NAME_APP}`, {skip_setup: true})
     _applicationLocalDB = new PouchDB(DB_NAME_APP)
     _applicationLocalDB.sync(_applicationDB, {live: true, retry: true})
+    _applicationLocalDB.changes({
+      since: 'now',
+      live: true,
+      include_docs: true
+    })
       .on(EVENT_DB_CHANGE, (event) => {
         // handle change
         console.log('> Database -> applicationDB - change:', event)
