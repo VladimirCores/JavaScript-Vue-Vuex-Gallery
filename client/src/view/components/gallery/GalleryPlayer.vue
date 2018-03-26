@@ -8,7 +8,7 @@
      @ready="onReady"
      @loaded="onLoaded"
     ></VideoPlayer>
-    <div class="cover" v-bind:style="{ height: height + 'px' }"/>
+    <div class="cover" v-bind:style="{ height: playerHeight + 'px' }"/>
     <AssetSpinner v-if="loading"></AssetSpinner>
   </div>
 </template>
@@ -56,7 +56,7 @@ export default {
       let result = ((window.innerWidth * 1080 / 1980)).toFixed(0)
       let heightLimit = window.innerHeight * 0.5
       if (heightLimit < 360) heightLimit = 360
-      if (result > heightLimit) result = heightLimit
+      if (result > heightLimit) result = heightLimit.toFixed(0)
       return result
     },
     width: () => window.innerWidth
@@ -71,7 +71,7 @@ export default {
       this.playerHeight = this.height
     },
     onLoaded () {
-      console.log('ON LOADED')
+      console.log('> GalleryPlayer -> ON LOADED')
       this.$emit(EVENT_LOADED)
     },
     onReady () {
