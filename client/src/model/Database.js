@@ -20,7 +20,7 @@ let _callbacks = {
 }
 
 function OnDatabaseEvent (dbName, event, response) {
-  if (response.ok) {
+  if (response && response.ok) {
     let docs = response.docs
     let interestsMap = _callbacks[EVENT_DB_CHANGE].get(dbName)
     docs.forEach(doc => {
