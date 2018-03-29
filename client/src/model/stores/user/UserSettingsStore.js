@@ -11,7 +11,7 @@ import {
   USER_SETTINGS_STORE_NAME
 } from '@/consts/StoreNames'
 
-import Database, { Event as DatabaseEvent } from '@/model/Database'
+import Database, { Event as DatabaseEvent } from '@/model/services/DatabaseService'
 
 let changeListenerID = 0
 

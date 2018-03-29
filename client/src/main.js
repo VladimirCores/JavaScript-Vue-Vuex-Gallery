@@ -6,7 +6,7 @@ import VueToasted from 'vue-toasted'
 import App from '@/App'
 import router from '@/view/router'
 
-import Database from '@/model/Database'
+import Database from '@/model/services/DatabaseService'
 import AuthDTO from '@/model/dtos/AuthDTO'
 import ApplicationAction from '@/consts/actions/ApplicationAction'
 import UserAction from '@/consts/actions/UserAction'

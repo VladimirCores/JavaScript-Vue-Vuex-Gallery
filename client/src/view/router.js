@@ -5,7 +5,7 @@ import PageNames from '@/consts/PageNames'
 import IndexPage from '@/view/pages/IndexPage'
 import NotFoundPage from '@/view/pages/NotFoundPage'
 
-import Database from '@/model/Database'
+import Database from '@/model/services/DatabaseService'
 
 Vue.use(VueRouter)
 

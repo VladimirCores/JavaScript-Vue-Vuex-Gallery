@@ -1,4 +1,4 @@
-import Database from '@/model/Database'
+import Database from '@/model/services/DatabaseService'
 
 /**
   return
