@@ -36,7 +36,6 @@ const registeredModules = []
 export default new Vuex.Store({
   state: new ApplicationVO(),
   strict: process.env.NODE_ENV !== 'production',
-  namespaced: true,
   actions: {
     [ApplicationAction.SETUP_SERVER] (store, payload) { store.commit(SERVER_DATA_SETUP, payload) },
     [ApplicationAction.SETUP_USER] (store, payload) {
