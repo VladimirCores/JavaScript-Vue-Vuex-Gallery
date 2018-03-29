@@ -1,4 +1,4 @@
-import Database from '@/model/services/DatabaseService'
+import DatabaseService from '@/model/services/DatabaseService'
 import UserSettingsError from '@/consts/errors/UserSettingsError'
 /**
  return

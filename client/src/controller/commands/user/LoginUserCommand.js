@@ -1,11 +1,11 @@
-import Database from '@/model/services/DatabaseService'
+import DatabaseService from '@/model/services/DatabaseService'
 import UserError from '@/consts/errors/UserError'
 
 class LoginUserCommand {
   execute (name, password) {
     console.log('===========================================================================')
     console.log('> LoginUserCommand > name | password:', name + ' | ' + password)
-    let db = Database.getApplicationInstance()
+    let db = DatabaseService.getApplicationInstance()
     return db
       .logIn(name, password)
       .then((response) => {

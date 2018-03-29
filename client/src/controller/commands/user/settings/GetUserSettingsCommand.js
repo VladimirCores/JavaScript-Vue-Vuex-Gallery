@@ -1,4 +1,4 @@
-import Database from '@/model/services/DatabaseService'
+import DatabaseService from '@/model/services/DatabaseService'
 
 /**
   return
@@ -10,7 +10,7 @@ import Database from '@/model/services/DatabaseService'
 */
 class GetSettingsUserCommand {
   execute (userSettingVO) {
-    let userDB = Database.getUserInstance()
+    let userDB = DatabaseService.getUserInstance()
     console.log('> GetSettingsUserCommand -> userSettingVO =', userSettingVO)
     return userDB.get('settings')
       .then((doc) => {

@@ -43,14 +43,14 @@ function _convertToHex (str) {
 }
 
 PouchDB.on('created', function (dbName) {
-  console.log('> Database -> DB_CREATED: dbName = ' + dbName)
+  console.log('> DatabaseService -> DB_CREATED: dbName = ' + dbName)
   if (_userDB && _userDB.name === dbName) {
   }
 })
 
-class Database {
+class DatabaseService {
   init () {
-    console.log('> Database -> Init: ' + DB_NAME_APP)
+    console.log('> DatabaseService -> Init: ' + DB_NAME_APP)
     _applicationDB = new PouchDB(`${DB_URL}${DB_NAME_APP}`, {skip_setup: true})
     _applicationLocalDB = new PouchDB(DB_NAME_APP)
     _applicationLocalDB.sync(_applicationDB, {live: true, retry: true})
@@ -61,28 +61,28 @@ class Database {
     })
       .on(EVENT_DB_CHANGE, (event) => {
         // handle change
-        console.log('> Database -> applicationDB - change:', event)
+        console.log('> DatabaseService -> applicationDB - change:', event)
         OnDatabaseEvent(DB_NAME_APP, EVENT_DB_CHANGE, event.change)
       })
       .on('paused', (err) => {
         // replication paused (e.g. replication up to date, user went offline)
-        console.log('> Database -> applicationDB - paused:', err)
+        console.log('> DatabaseService -> applicationDB - paused:', err)
       })
       .on('active', () => {
         // replicate resumed (e.g. new changes replicating, user went back online)
-        console.log('> Database -> applicationDB - active')
+        console.log('> DatabaseService -> applicationDB - active')
       })
       .on('denied', (err) => {
         // a document failed to replicate (e.g. due to permissions)
-        console.log('> Database -> applicationDB - denied:', err)
+        console.log('> DatabaseService -> applicationDB - denied:', err)
       })
       .on('complete', function (info) {
         // handle complete
-        console.log('> Database -> applicationDB - complete:', info)
+        console.log('> DatabaseService -> applicationDB - complete:', info)
       })
       .on('error', (err) => {
         // handle error
-        console.log('> Database -> applicationDB - error:', err)
+        console.log('> DatabaseService -> applicationDB - error:', err)
       })
     return this
   }
@@ -95,8 +95,8 @@ class Database {
   // AUTHORIZATION
   configureForUser (username, password) {
     console.log('===========================================================================')
-    console.log('> Database -> configureForUser: username = ' + username)
-    console.log('> Database -> configureForUser: password = ' + password)
+    console.log('> DatabaseService -> configureForUser: username = ' + username)
+    console.log('> DatabaseService -> configureForUser: password = ' + password)
     let promise = new Promise((resolve) => {
       _userDB = new PouchDB(DB_NAME_USER)
       _userDB.sync(new PouchDB(`${DB_URL}/${DB_NAME_USER}-${_convertToHex(username).toLowerCase()}`, {
@@ -111,7 +111,7 @@ class Database {
       })
         .on(EVENT_DB_CHANGE, (event) => {
           // handle change
-          console.log('> Database -> userDB - change:', event)
+          console.log('> DatabaseService -> userDB - change:', event)
           OnDatabaseEvent(DB_NAME_USER, EVENT_DB_CHANGE, event.change)
           // let change = event.change
           // if (change.ok) {
@@ -128,34 +128,34 @@ class Database {
         })
         .on('paused', (err) => {
           // replication paused (e.g. replication up to date, user went offline)
-          console.log('> Database -> userDB - paused:', err)
+          console.log('> DatabaseService -> userDB - paused:', err)
         })
         .on('active', () => {
           // replicate resumed (e.g. new changes replicating, user went back online)
-          console.log('> Database -> userDB - active')
+          console.log('> DatabaseService -> userDB - active')
         })
         .on('denied', (err) => {
           // a document failed to replicate (e.g. due to permissions)
-          console.log('> Database -> userDB - denied:', err)
+          console.log('> DatabaseService -> userDB - denied:', err)
         })
         .on('complete', function (info) {
           // handle complete
-          console.log('> Database -> userDB - complete:', info)
+          console.log('> DatabaseService -> userDB - complete:', info)
         })
         .on('error', (err) => {
           // handle error
-          console.log('> Database -> userDB - complete:', err)
+          console.log('> DatabaseService -> userDB - complete:', err)
         })
       _userDB.info().then(resolve)
     })
-    console.log('> Database -> USER_DB: _userDB.name = ' + _userDB.name)
+    console.log('> DatabaseService -> USER_DB: _userDB.name = ' + _userDB.name)
     console.log('===========================================================================')
     return promise
   }
   isAuthorized () {
     return _applicationDB.getSession()
       .then((response) => {
-        console.log('> Database -> getSession:', response)
+        console.log('> DatabaseService -> getSession:', response)
         return response ? response.userCtx.name : null // response.userCtx.name is the current user
       })
   }
@@ -167,7 +167,7 @@ class Database {
       let callbacksMap = userInterestsMap.get(interestId)
       let listenerID = Date.now()
       callbacksMap.set(listenerID, callback)
-      console.log('> Database -> addUserEventListener: eventName | interestId =', eventName, interestId, callbacksMap.keys())
+      console.log('> DatabaseService -> addUserEventListener: eventName | interestId =', eventName, interestId, callbacksMap.keys())
       return listenerID
     }
   }
@@ -179,13 +179,13 @@ class Database {
         let callbacksMap = userInterestsMap.get(interestId)
         if (!callbacksMap) return
         callbacksMap.delete(listenerID)
-        console.log('> Database -> removeUserEventListener: eventName | interestId =', eventName, interestId, callbacksMap.keys())
+        console.log('> DatabaseService -> removeUserEventListener: eventName | interestId =', eventName, interestId, callbacksMap.keys())
       }
     }
   }
 }
 
-const DB = new Database()
+const DB = new DatabaseService()
 export default DB
 
 export const Event = {

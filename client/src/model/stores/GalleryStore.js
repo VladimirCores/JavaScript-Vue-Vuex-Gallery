@@ -11,7 +11,7 @@ import {
   GALLERY_STORE_NAME, USER_SETTINGS_STORE_NAME
 } from '@/consts/StoreNames'
 
-import Database, {Event as DatabaseEvent} from '@/model/services/DatabaseService'
+import DatabaseService, {Event as DatabaseEvent} from '@/model/services/DatabaseService'
 
 let _PRIVATE_GET_USER_SETTINGS = 'private_getter_get_user_settings'
 let _PRIVATE_GET_SERVER = 'private_getter_get_server'
@@ -25,14 +25,14 @@ export default {
   namespaced: true,
   onRegister (store) {
     console.log('> GalleryStore -> onRegister')
-    changeListenerID = Database.addUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, (doc) => {
+    changeListenerID = DatabaseService.addUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, (doc) => {
       console.log('> GalleryStore -> DatabaseEvent.CHANGE:', doc)
       store.dispatch(GalleryAction.SETUP_GALLERY_VIEW)
     })
   },
   onRemove (store) {
     console.log('> GalleryStore -> onRemove')
-    Database.removeUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, changeListenerID)
+    DatabaseService.removeUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, changeListenerID)
   },
   actions: {
     [GalleryAction.SETUP_GALLERY_VIEW] (store) {

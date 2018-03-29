@@ -11,7 +11,7 @@ import {
   USER_SETTINGS_STORE_NAME
 } from '@/consts/StoreNames'
 
-import Database, { Event as DatabaseEvent } from '@/model/services/DatabaseService'
+import DatabaseService, { Event as DatabaseEvent } from '@/model/services/DatabaseService'
 
 let changeListenerID = 0
 
@@ -22,14 +22,14 @@ const UserSettingsStore = {
   namespaced: false,
   onRegister (store) {
     console.log('> UserSettingsStore -> onRegister')
-    changeListenerID = Database.addUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, (doc) => {
+    changeListenerID = DatabaseService.addUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, (doc) => {
       console.log('> UserSettingsStore -> DatabaseEvent.CHANGE:', doc, store)
       store.commit(UserSettingsMutation.SETUP_SETTINGS, doc)
     })
   },
   onRemove (store) {
     console.log('> UserSettingsStore -> onRemove')
-    Database.removeUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, changeListenerID)
+    DatabaseService.removeUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, changeListenerID)
   },
   actions: {
     [UserSettingsAction.CONFIG]: (store, payload) => {

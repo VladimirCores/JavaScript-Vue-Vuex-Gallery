@@ -6,14 +6,14 @@ import VueToasted from 'vue-toasted'
 import App from '@/App'
 import router from '@/view/router'
 
-import Database from '@/model/services/DatabaseService'
+import DatabaseService from '@/model/services/DatabaseService'
 import AuthDTO from '@/model/dtos/AuthDTO'
 import ApplicationAction from '@/consts/actions/ApplicationAction'
 import UserAction from '@/consts/actions/UserAction'
 
 Vue.use(VueToasted)
 Vue.config.productionTip = false
-Database.init().production()
+DatabaseService.init().production()
 
 const store = App.store
 
@@ -23,9 +23,9 @@ new Vue({
   router,
   render: h => h(App),
   beforeCreate: function () {
-    let db = Database.getApplicationInstance()
+    let db = DatabaseService.getApplicationInstance()
     return Promise.all([
-      Database.isAuthorized().then((user) => {
+      DatabaseService.isAuthorized().then((user) => {
         console.log('> Main -> beforeCreate: session =', user)
         if (user) {
           return db.getUser(user).then((userDoc) => {

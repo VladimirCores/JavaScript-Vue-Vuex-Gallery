@@ -1,4 +1,4 @@
-import Database from '@/model/services/DatabaseService'
+import DatabaseService from '@/model/services/DatabaseService'
 import UserError from '@/consts/errors/UserError'
 
 /**
@@ -11,7 +11,7 @@ import UserError from '@/consts/errors/UserError'
 */
 class SignUpUserCommand {
   execute (name, password, firstName, lastName) {
-    let db = Database.getApplicationInstance()
+    let db = DatabaseService.getApplicationInstance()
     let metadata = {
       email: name,
       firstName: firstName,

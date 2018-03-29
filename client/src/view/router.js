@@ -5,12 +5,12 @@ import PageNames from '@/consts/PageNames'
 import IndexPage from '@/view/pages/IndexPage'
 import NotFoundPage from '@/view/pages/NotFoundPage'
 
-import Database from '@/model/services/DatabaseService'
+import DatabaseService from '@/model/services/DatabaseService'
 
 Vue.use(VueRouter)
 
 const isAuthorized = function (next, redirect, reverse = false) {
-  return Database.isAuthorized()
+  return DatabaseService.isAuthorized()
     .then(user => {
       console.log('> Router -> isAuthorized =', user)
       let authorized = (user != null)

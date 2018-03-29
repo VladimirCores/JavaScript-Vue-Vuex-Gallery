@@ -1,4 +1,4 @@
-import Database from '@/model/services/DatabaseService'
+import DatabaseService from '@/model/services/DatabaseService'
 import UserSettingsError from '@/consts/errors/UserSettingsError'
 /**
   return
@@ -10,7 +10,7 @@ import UserSettingsError from '@/consts/errors/UserSettingsError'
 */
 class SetSettingsUserCommand {
   execute (input) {
-    let userDB = Database.getUserInstance()
+    let userDB = DatabaseService.getUserInstance()
     console.log('> SetSettingsUserCommand -> input =', input)
     return userDB.get('settings').then((doc) => {
       if (doc.userID === input.userID &&

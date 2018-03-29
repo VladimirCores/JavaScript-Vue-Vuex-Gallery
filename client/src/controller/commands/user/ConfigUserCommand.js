@@ -1,4 +1,4 @@
-import Database from '@/model/services/DatabaseService'
+import DatabaseService from '@/model/services/DatabaseService'
 
 // import UserError from '@/consts/errors/UserError'
 
@@ -13,7 +13,7 @@ import Database from '@/model/services/DatabaseService'
 class ConfigUserCommand {
   execute (userDoc) {
     console.log('> ConfigUserCommand > userDoc:', userDoc)
-    return Database.configureForUser(userDoc.name, userDoc.password_scheme)
+    return DatabaseService.configureForUser(userDoc.name, userDoc.password_scheme)
   }
 }
 

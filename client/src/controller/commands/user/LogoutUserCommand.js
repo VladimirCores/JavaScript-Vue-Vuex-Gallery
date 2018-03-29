@@ -1,4 +1,4 @@
-import Database from '@/model/services/DatabaseService'
+import DatabaseService from '@/model/services/DatabaseService'
 
 import UserError from '@/consts/errors/UserError'
 
@@ -11,7 +11,7 @@ import UserError from '@/consts/errors/UserError'
 */
 class LogoutUserCommand {
   execute (userVO) {
-    let appDB = Database.getApplicationInstance()
+    let appDB = DatabaseService.getApplicationInstance()
     return appDB.putUser(userVO.name, { metadata: { logged: false } }).then((status) => {
       console.log('> LogoutUserCommand > putUser metadata: status =', status)
       return appDB.logOut().then((response) => { // response {"ok":true}
