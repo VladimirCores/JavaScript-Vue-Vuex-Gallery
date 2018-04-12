@@ -12,7 +12,7 @@ function IsWrongServer (serverVO) {
 }
 
 function IsWrongUserSettings (userSettingsVO) {
-  var notNull = !!userSettingsVO
+  let notNull = !!userSettingsVO
   return !notNull ||
     (notNull && (
       (userSettingsVO.userID == null || userSettingsVO.userID.length === 0) ||
@@ -26,8 +26,7 @@ class GetGalleryDataCommand {
     IsWrongUserSettings.bind(this)
   }
   execute (serverVO, userSettingsVO, galleryVO) {
-    return new Promise((resolve, reject) => {
-      // https://developer.vimeo.com/api/authentication
+    return new Promise((resolve, reject) => { // https://developer.vimeo.com/api/authentication
       if (IsWrongServer(serverVO)) reject(GalleryError.WRONG_SERVER_DATA)
       if (IsWrongUserSettings(userSettingsVO)) reject(GalleryError.WRONG_USER_SETTINGS_DATA)
       else {
@@ -64,5 +63,4 @@ class GetGalleryDataCommand {
 }
 
 const SINGLETON = new GetGalleryDataCommand()
-
 export default SINGLETON

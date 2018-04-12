@@ -11,7 +11,8 @@ import {
   GALLERY_STORE_NAME, USER_SETTINGS_STORE_NAME
 } from '@/consts/StoreNames'
 
-import DatabaseService, {Event as DatabaseEvent} from '@/model/services/DatabaseService'
+import DatabaseService from '@/model/services/DatabaseService'
+import DatabaseEvent from '@/consts/database/DatabaseEvents'
 
 let _PRIVATE_GET_USER_SETTINGS = 'private_getter_get_user_settings'
 let _PRIVATE_GET_SERVER = 'private_getter_get_server'
