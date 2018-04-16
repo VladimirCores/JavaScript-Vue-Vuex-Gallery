@@ -75,11 +75,12 @@ export default {
     showError = ConstructErrorToast(this.$toasted)
   },
   data: function () {
+    let date = Date.now()
     return {
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: ''
+      firstName: 'A',
+      lastName: 'S',
+      email: date + '@mailreg.com',
+      password: '12345678'
     }
   }
 }

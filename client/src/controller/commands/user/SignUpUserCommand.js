@@ -10,21 +10,20 @@ import UserError from '@/consts/errors/UserError'
     - Int UserError.SIGN_UP_FAILED
 */
 class SignUpUserCommand {
-  execute (name, password, firstName, lastName) {
-    let db = DatabaseService.getApplicationInstance()
+  execute (email, password, firstName, lastName) {
     let metadata = {
-      email: name,
+      email: email,
       firstName: firstName,
       lastName: lastName,
       logged: false
     }
-    return db
-      .signUp(name, password, { metadata })
+    return DatabaseService
+      .signUp(email, password, { metadata })
       .then((response) => {
         // {ok: true, id: "org.couchdb.user:myname@gmail.com", rev: "5-2604e0329e2a2f5bd7c10677d0448d25"}
         console.log('> SignUpUserCommand > signUp: response.ok =', response.ok)
         if (response.ok) {
-          return { name: name, password: password }
+          return { name: email, password: password }
         } else return UserError.SIGN_UP_RESPONSE
       })
       .catch((error) => {

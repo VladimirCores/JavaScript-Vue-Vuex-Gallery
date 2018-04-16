@@ -23,7 +23,7 @@ DatabaseService.init(AvailableDatabases.FIREBASE_DB).then(db => {
       beforeCreate: function () {
         return Promise.all([
           DatabaseService.isAuthorized().then((user) => {
-            // console.log('> Main -> beforeCreate: session =', user)
+            console.log('> Main -> beforeCreate: isAuthorized = user:', user)
             if (user) {
               return DatabaseService.getUser(user).then((userDoc) => {
                 console.log('> Main -> beforeCreate: user =', userDoc)

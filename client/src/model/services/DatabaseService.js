@@ -1,5 +1,4 @@
 let _db
-let _isDBReady = false
 
 export const AvailableDatabases = {
   COUCH_DB: 'CouchDatabase',
@@ -11,16 +10,17 @@ class DatabaseService {
     return import(`@/model/services/database/${type}`).then(module => {
       _db = module.default
       _db.init()
-      _isDBReady = true
       return _db
     })
   }
   // API
+  put (key) { return _db.get(key) }
   get (key) { return _db.get(key) }
   getUser (user) { return _db.getUser(user) }
-  // INSTANCES
-  getApplicationInstance () { return _db.getApplicationInstance() }
-  getUserInstance () { return _db.getUserInstance() }
+  updateUser (email, data) { return _db.updateUser(email, data) }
+  signUp (email, password, ...rest) { return _db.signUp(email, password, rest) }
+  logIn (email, password) { return _db.logIn(email, password) }
+  logOut () { return _db.logOut() }
   // DEPLOYMENT CONFIGURATION
   production () { _db.production() }
   debug () { _db.debug() }
@@ -32,15 +32,14 @@ class DatabaseService {
     return _db.configureForUser(username, password)
   }
   isAuthorized () {
-    console.log('_isDBReady:', _isDBReady, this.getApplicationInstance())
     return _db.isAuthorized()
   }
   // LISTENERS
   addUserEventListener (eventName, interestId, callback) {
-    this.getUserInstance().addUserEventListener(eventName, interestId, callback)
+    _db.addUserEventListener(eventName, interestId, callback)
   }
   removeUserEventListener (eventName, interestId, listenerID) {
-    this.getUserInstance().removeUserEventListener(eventName, interestId, listenerID)
+    _db.removeUserEventListener(eventName, interestId, listenerID)
   }
 }
 

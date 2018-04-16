@@ -2,28 +2,28 @@ import DatabaseService from '@/model/services/DatabaseService'
 import UserError from '@/consts/errors/UserError'
 
 class LoginUserCommand {
-  execute (name, password) {
+  execute (email, password) {
     console.log('===========================================================================')
-    console.log('> LoginUserCommand > name | password:', name + ' | ' + password)
-    let db = DatabaseService.getApplicationInstance()
-    return db
-      .logIn(name, password)
+    console.log('> LoginUserCommand > name | password:', email + ' | ' + password)
+    return DatabaseService
+      .logIn(email, password)
       .then((response) => {
         // {"ok":true,"name":"david","roles":[]}
         console.log('> LoginUserCommand > logIn: response =', response)
         if (response.ok) {
-          return db.getUser(name).then((response) => {
+          return DatabaseService.getUser(email).then((response) => {
             console.log('> LoginUserCommand > getUser: response =', response)
-            response.logged = true
-            return db.putUser(name, { metadata: { logged: true } })
-              .then((status) => {
-                console.log('> LoginUserCommand > putUser: status =', status)
-                return response
-              })
-              .catch((error) => {
-                console.log('> LoginUserCommand > putUser error =', error)
-                return response
-              })
+            return response
+            // response.logged = true
+            // return DatabaseService.updateUser(email, { metadata: { logged: true } })
+            //   .then((status) => {
+            //     console.log('> LoginUserCommand > updateUser: status =', status)
+            //     return response
+            //   })
+            //   .catch((error) => {
+            //     console.log('> LoginUserCommand > updateUser error =', error)
+            //     return response
+            //   })
           })
         } else return UserError.LOG_IN_FAILED
       })
