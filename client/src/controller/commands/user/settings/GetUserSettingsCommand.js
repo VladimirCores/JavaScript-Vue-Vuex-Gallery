@@ -8,19 +8,20 @@ import DatabaseService from '@/model/services/DatabaseService'
     - Int UserError.SIGN_UP_RESPONSE
     - Int UserError.SIGN_UP_FAILED
 */
+const KEY_SETTINGS = 'settings'
+
 class GetSettingsUserCommand {
   execute (userSettingVO) {
-    let userDB = DatabaseService.getUserInstance()
     console.log('> GetSettingsUserCommand -> userSettingVO =', userSettingVO)
-    return userDB.get('settings')
+    return DatabaseService.getUserData(KEY_SETTINGS)
       .then((doc) => {
         console.log('> GetSettingsUserCommand -> doc =', doc)
         return doc
       })
       .catch((error) => {
-        console.log('> GetSettingsUserCommand > error:', error)
+        console.log('> GetSettingsUserCommand > error:', error.status)
         if (error.status === 404) {
-          return userDB.put(userSettingVO)
+          return DatabaseService.setUserData(KEY_SETTINGS, userSettingVO)
         }
       })
   }

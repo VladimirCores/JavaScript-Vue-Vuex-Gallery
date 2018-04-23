@@ -6,13 +6,13 @@ import VueToasted from 'vue-toasted'
 import App from '@/App'
 
 import DatabaseService, { AvailableDatabases } from '@/model/services/DatabaseService'
-// import AuthDTO from '@/model/dtos/AuthDTO'
+import AuthDTO from '@/model/dtos/AuthDTO'
 import ApplicationAction from '@/consts/actions/ApplicationAction'
-// import UserAction from '@/consts/actions/UserAction'
+import UserAction from '@/consts/actions/UserAction'
 
 Vue.use(VueToasted)
 Vue.config.productionTip = false
-DatabaseService.init(AvailableDatabases.FIREBASE_DB).then(db => {
+DatabaseService.init(AvailableDatabases.COUCH_DB).then(db => {
   db.production()
   import('@/view/router').then(router => {
     /* eslint-disable no-new */
@@ -25,10 +25,11 @@ DatabaseService.init(AvailableDatabases.FIREBASE_DB).then(db => {
           DatabaseService.isAuthorized().then((user) => {
             console.log('> Main -> beforeCreate: isAuthorized = user:', user)
             if (user) {
+              // DatabaseService.getApplicationInstance().deleteUser(user)
               return DatabaseService.getUser(user).then((userDoc) => {
                 console.log('> Main -> beforeCreate: user =', userDoc)
-                // let authDTO = new AuthDTO(userDoc, UserAction.CONFIG)
-                // return App.store.dispatch(ApplicationAction.SETUP_USER, authDTO)
+                let authDTO = new AuthDTO(userDoc, UserAction.CONFIG)
+                return App.store.dispatch(ApplicationAction.SETUP_USER, authDTO)
               })
             }
           }),
@@ -40,7 +41,7 @@ DatabaseService.init(AvailableDatabases.FIREBASE_DB).then(db => {
           console.log('> Main -> Application Initialized', values)
           App.store.dispatch(ApplicationAction.INITIALIZED)
         }).catch((error) => {
-          console.log(error)
+          console.log('> Main -> Application Error', error)
         })
       }
     })

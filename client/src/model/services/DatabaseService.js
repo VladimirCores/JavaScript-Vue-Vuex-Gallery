@@ -14,9 +14,10 @@ class DatabaseService {
     })
   }
   // API
-  put (key) { return _db.get(key) }
   get (key) { return _db.get(key) }
   getUser (user) { return _db.getUser(user) }
+  getUserData (key) { return _db.getUserData(key) }
+  setUserData (key, data) { return _db.setUserData(key, data) }
   updateUser (email, data) { return _db.updateUser(email, data) }
   signUp (email, password, ...rest) { return _db.signUp(email, password, rest) }
   logIn (email, password) { return _db.logIn(email, password) }
@@ -25,12 +26,12 @@ class DatabaseService {
   production () { _db.production() }
   debug () { _db.debug() }
   // AUTHORIZATION
-  configureForUser (username, password) {
+  configureForUser (userDoc) {
     console.log('===========================================================================')
-    console.log('> DatabaseService -> configureForUser: username = ' + username)
-    console.log('> DatabaseService -> configureForUser: password = ' + password)
-    return _db.configureForUser(username, password)
+    return _db.configureForUser(userDoc)
   }
+  getApplicationInstance () { return _db.getApplicationInstance() }
+  getUserInstance () { return _db.getUserInstance() }
   isAuthorized () {
     return _db.isAuthorized()
   }

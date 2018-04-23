@@ -1,5 +1,5 @@
 {
-  "name": "vue-gallery",
+  "name": "vimeo-likes-gallery",
   "version": "1.0.0",
   "description": "A Vue.js project",
   "author": "Vladimir Minkin <Vladimir.Minkin@massive.co>",
@@ -22,6 +22,7 @@
     "vue-lazy-images": "^1.4.6",
     "vue-router": "^3.0.1",
     "vue-toasted": "^1.1.24",
+    "vue-vimeo-player": "0.0.6",
     "vuex": "^3.0.1"
   },
   "devDependencies": {

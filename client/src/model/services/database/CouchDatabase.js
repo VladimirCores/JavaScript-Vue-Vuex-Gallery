@@ -7,9 +7,9 @@ PouchDB.plugin(PouchAuth)
 const DB_NAME_APP = 'application'
 const DB_NAME_USER = 'userdb'
 const DB_URL = 'http://localhost:5984/'
-// const DB_URL = 'http://35.196.32.66/couchdb/'
-// const DB_URL = 'https://8812fb94-a144-44eb-a34e-3f0c15952786-bluemix.cloudant.com/'
-// const DB_URL = 'https://8080-dot-3754753-dot-devshell.appspot.com/db/'
+// const DB_URL = 'http://35.196.212.37/'
+
+// SSL Config: https://cwiki.apache.org/confluence/display/COUCHDB/Nginx+as+a+proxy
 
 /* eslint no-new-symbol: 2 */
 /* eslint-env es6 */
@@ -93,6 +93,12 @@ class CouchDatabase {
   // API
   get (key) { return _applicationDB.get(key) }
   getUser (user) { return _applicationDB.getUser(user) }
+  getUserData (key) { return _userDB.get(key) }
+  setUserData (key, data) { return _userDB.put(data) }
+  updateUser (email, data) { return _applicationDB.putUser(email, data) }
+  signUp (email, password, ...rest) { return _applicationDB.signUp(email, password, rest) }
+  logIn (email, password) { return _applicationDB.logIn(email, password) }
+  logOut () { return _applicationDB.logOut() }
   // INSTANCES
   getApplicationInstance () { return _applicationDB }
   getUserInstance () { return _userDB }
@@ -100,10 +106,11 @@ class CouchDatabase {
   production () { PouchDB.debug.disable() }
   debug () { PouchDB.debug.enable('*') }
   // AUTHORIZATION
-  configureForUser (username, password) {
-    console.log('===========================================================================')
-    console.log('> DatabaseService -> configureForUser: username = ' + username)
-    console.log('> DatabaseService -> configureForUser: password = ' + password)
+  configureForUser (userDoc) {
+    let username = userDoc.name
+    let password = userDoc.password_scheme
+    console.log('> CouchDatabase -> configureForUser: username = ' + username)
+    console.log('> CouchDatabase -> configureForUser: password = ' + password)
     let promise = new Promise((resolve) => {
       _userDB = new PouchDB(DB_NAME_USER)
       _userDB.sync(new PouchDB(`${DB_URL}/${DB_NAME_USER}-${_convertToHex(username).toLowerCase()}`, {
@@ -120,18 +127,6 @@ class CouchDatabase {
           // handle change
           console.log('> DatabaseService -> userDB - change:', event)
           OnDatabaseEvent(DB_NAME_USER, DatabaseEvents.CHANGE, event.change)
-          // let change = event.change
-          // if (change.ok) {
-          //   let docs = change.docs
-          //   let interestsMap = _callbacks[EVENT_DB_CHANGE].get(DB_NAME_USER)
-          //   docs.forEach(doc => {
-          //     let interestID = doc._id
-          //     if (interestsMap.has(interestID)) {
-          //       let callbacks = interestsMap.get(interestID)
-          //       callbacks.forEach(callback => callback(doc))
-          //     }
-          //   })
-          // }
         })
         .on('paused', (err) => {
           // replication paused (e.g. replication up to date, user went offline)

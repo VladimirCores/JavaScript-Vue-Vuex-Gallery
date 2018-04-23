@@ -13,17 +13,16 @@ class LoginUserCommand {
         if (response.ok) {
           return DatabaseService.getUser(email).then((response) => {
             console.log('> LoginUserCommand > getUser: response =', response)
-            return response
-            // response.logged = true
-            // return DatabaseService.updateUser(email, { metadata: { logged: true } })
-            //   .then((status) => {
-            //     console.log('> LoginUserCommand > updateUser: status =', status)
-            //     return response
-            //   })
-            //   .catch((error) => {
-            //     console.log('> LoginUserCommand > updateUser error =', error)
-            //     return response
-            //   })
+            response.logged = true
+            return DatabaseService.updateUser(email, { metadata: { logged: true } })
+              .then((status) => {
+                console.log('> LoginUserCommand > updateUser: status =', status)
+                return response
+              })
+              .catch((error) => {
+                console.log('> LoginUserCommand > updateUser error =', error)
+                return response
+              })
           })
         } else return UserError.LOG_IN_FAILED
       })

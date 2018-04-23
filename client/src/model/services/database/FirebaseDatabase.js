@@ -30,12 +30,32 @@ class FirebaseDatabase {
       }
     })
   }
-  putUser (email, data) {
+  setUserData (key, data) {
+    let user = firebase.auth().currentUser
+    return new Promise((resolve) => {
+      console.log('> FirebaseDatabase -> setUserData:', key, data)
+      firebase.database().ref('users/' + user.uid).child(key).set(data).then(resolve)
+    })
+  }
+  getUserData (key) {
+    let user = firebase.auth().currentUser
+    return new Promise((resolve) => {
+      let value = firebase.database().ref('users/' + user.uid).child(key).value
+      console.log('> FirebaseDatabase -> getUserData data:', value)
+      if (value != null) resolve(value)
+      else {
+        let error = new Error()
+        error.status = 404
+        throw error
+      }
+    })
+  }
+  updateUser (email, data) {
     let user = firebase.auth().currentUser
     return firebase.database().ref('users/' + user.uid).set(data)
   }
-  getUser (user) {
-    return new Promise(function (resolve, reject) {
+  getUser (email) {
+    return new Promise((resolve) => {
       resolve(firebase.auth().currentUser)
     })
   }
@@ -68,6 +88,11 @@ class FirebaseDatabase {
         }
         return {ok: false, id: errorMessage}
       })
+  }
+  configureForUser (userDoc) {
+    return new Promise((resolve, reject) => {
+      resolve()
+    })
   }
   // INSTANCES
   getUserInstance () { }
