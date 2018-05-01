@@ -6,8 +6,9 @@ PouchDB.plugin(PouchAuth)
 
 const DB_NAME_APP = 'application'
 const DB_NAME_USER = 'userdb'
-const DB_URL = 'http://localhost:5984/'
-// const DB_URL = 'http://35.196.212.37/'
+// const DB_URL = 'http://localhost:5984/'
+const DB_URL = 'https://softwaredesign.ml/'
+// const DB_URL = 'https://91259cbc-59f2-4664-8c46-b1d5ec6e9537-bluemix.cloudant.com/'
 
 // SSL Config: https://cwiki.apache.org/confluence/display/COUCHDB/Nginx+as+a+proxy
 
@@ -158,7 +159,7 @@ class CouchDatabase {
     return _applicationDB.getSession()
       .then((response) => {
         console.log('> DatabaseService -> getSession:', response)
-        return response ? response.userCtx.name : null // response.userCtx.name is the current user
+        return response ? ((name) => { return name && (name !== 'admin' && name.indexOf('bluemix') < 0) ? name : null })(response.userCtx.name) : null // response.userCtx.name is the current user
       })
   }
   addUserEventListener (eventName, interestId, callback) {

@@ -12,7 +12,7 @@ import UserAction from '@/consts/actions/UserAction'
 
 Vue.use(VueToasted)
 Vue.config.productionTip = false
-DatabaseService.init(AvailableDatabases.COUCH_DB).then(db => {
+DatabaseService.init(AvailableDatabases.FIREBASE_DB).then(db => {
   db.production()
   import('@/view/router').then(router => {
     /* eslint-disable no-new */
@@ -24,7 +24,7 @@ DatabaseService.init(AvailableDatabases.COUCH_DB).then(db => {
         return Promise.all([
           DatabaseService.isAuthorized().then((user) => {
             console.log('> Main -> beforeCreate: isAuthorized = user:', user)
-            if (user) {
+            if (user && user !== 'admin') {
               // DatabaseService.getApplicationInstance().deleteUser(user)
               return DatabaseService.getUser(user).then((userDoc) => {
                 console.log('> Main -> beforeCreate: user =', userDoc)

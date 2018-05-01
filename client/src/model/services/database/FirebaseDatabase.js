@@ -1,8 +1,11 @@
 import firebase from 'firebase'
 import 'firebase/firestore'
 import 'firebase/auth'
+import UserVO from '@/model/vos/UserVO'
 
-let _db
+let _applicationDB
+let _userDB
+let _userDBWrapper = { }
 
 const ERROR_CODES = {
   AUTH_WEAK_PASSWORD: 'auth/weak-password',
@@ -17,11 +20,11 @@ class FirebaseDatabase {
       databaseURL: 'https://vimeo-likes-gallery-firebase.firebaseio.com',
       projectId: 'vimeo-likes-gallery-firebase'
     })
-    _db = firebase.firestore()
+    _applicationDB = firebase.firestore()
   }
   // API
   get (key) {
-    return _db.collection('application').doc(key).get().then(function (doc) {
+    return _applicationDB.collection('application').doc(key).get().then(function (doc) {
       if (doc.exists) {
         return doc.data()
       } else {
@@ -31,23 +34,25 @@ class FirebaseDatabase {
     })
   }
   setUserData (key, data) {
-    let user = firebase.auth().currentUser
     return new Promise((resolve) => {
       console.log('> FirebaseDatabase -> setUserData:', key, data)
-      firebase.database().ref('users/' + user.uid).child(key).set(data).then(resolve)
+      _userDB.child(key).set(data).then(resolve)
     })
   }
   getUserData (key) {
-    let user = firebase.auth().currentUser
     return new Promise((resolve) => {
-      let value = firebase.database().ref('users/' + user.uid).child(key).value
-      console.log('> FirebaseDatabase -> getUserData data:', value)
-      if (value != null) resolve(value)
-      else {
-        let error = new Error()
-        error.status = 404
-        throw error
-      }
+      let user = firebase.auth().currentUser
+      let ref = _userDB.child(key)
+      console.log('> FirebaseDatabase -> getUserData user.uid:', user.uid)
+      console.log('> FirebaseDatabase -> getUserData key:', key)
+      ref.once('value').then((value) => {
+        if (value != null) resolve(value.val())
+        else {
+          let error = new Error()
+          error.status = 404
+          throw error
+        }
+      })
     })
   }
   updateUser (email, data) {
@@ -56,14 +61,32 @@ class FirebaseDatabase {
   }
   getUser (email) {
     return new Promise((resolve) => {
-      resolve(firebase.auth().currentUser)
+      console.log('> FirebaseDatabase -> firebase.UserInfo : ' + firebase.UserInfo)
+      let user = firebase.auth().currentUser
+      let userVO = new UserVO()
+      if (user != null) {
+        let profile = user.providerData[0]
+        // user.providerData.forEach(function (profile) {
+        // console.log('Sign-in provider: ' + profile.providerId)
+        // console.log('  Provider-specific UID: ' + profile.uid)
+        // console.log('  Name: ' + profile.displayName)
+        // console.log('  Email: ' + profile.email)
+        // console.log('  Photo URL: ' + profile.photoURL)
+        userVO._id = profile.uid
+        userVO.email = profile.email
+        userVO.name = profile.displayName
+        // })
+      }
+      resolve(userVO)
     })
   }
   logIn (email, password) {
     let response = {ok: true}
     if (!this.isAuthorized()) {
-      return firebase.auth().signInWithEmailAndPassword(email, password).then(() => {
-        return response
+      return firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION).then(() => {
+        return firebase.auth().signInWithEmailAndPassword(email, password).then(() => {
+          return response
+        })
       })
     } else {
       return new Promise(function (resolve, reject) {
@@ -91,25 +114,47 @@ class FirebaseDatabase {
   }
   configureForUser (userDoc) {
     return new Promise((resolve, reject) => {
+      let user = firebase.auth().currentUser
+      let that = this
+      _userDB = firebase.database().ref('users/' + user.uid)
+      _userDBWrapper.put = function (data) {
+        return new Promise((resolve, reject) => {
+          console.log('> FirebaseDatabase -> _userDBWrapper > put: ', data)
+          return that.setUserData(data._id, data).then(() => {
+            data.ok = true
+            resolve(data)
+          })
+        })
+      }
+      _userDBWrapper.get = function (key) {
+        let value = firebase.database().ref('users/' + user.uid).child(key)
+        console.log('> FirebaseDatabase -> _userDBWrapper > value: ', value)
+        return that.getUserData(key)
+      }
       resolve()
     })
   }
   // INSTANCES
-  getUserInstance () { }
+  getUserInstance () { return _userDBWrapper }
   // DEPLOYMENT CONFIGURATION
   production () { }
   debug () { }
   isAuthorized () {
     return new Promise(function (resolve, reject) {
-      resolve(firebase.UserInfo)
+      firebase.auth().onAuthStateChanged((user) => {
+        console.log('> FirebaseDatabase -> isAuthorized : ' + user)
+        resolve(user ? user.uid : null)
+      })
     })
   }
   addUserEventListener (eventName, interestId, callback) {
     let currentUser = firebase.auth().currentUser
     console.log('> FirebaseDatabase -> addUserEventListener: currentUser', currentUser)
     if (currentUser != null) {
-      // _db.ref('/users/' + currentUser.uid).on('value', function (snapshot) {
-      // })
+      firebase.database().ref('/users/' + currentUser.uid).child(interestId).on('value', function (snapshot) {
+        console.log('> FirebaseDatabase -> update: snapshot', snapshot.val())
+        callback(snapshot.val())
+      })
     } else {
       console.error('> FirebaseDatabase -> addUserEventListener: User does not exist')
     }

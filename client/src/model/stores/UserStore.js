@@ -66,6 +66,7 @@ const UserStore = {
       console.log('> UserStore -> UserAction.CONFIG : payload =', !!payload)
       return ConfigUserCommand.execute(payload).then((result) => {
         console.log('> UserStore -> UserAction.CONFIG : result =', !result)
+        console.log('> UserStore -> UserAction.CONFIG : payload =', payload)
         store.commit(UserMutation.LOG_IN_USER, payload)
         store.dispatch(UserSettingsAction.CONFIG, payload)
       })
