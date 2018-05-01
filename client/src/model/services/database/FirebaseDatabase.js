@@ -40,17 +40,18 @@ class FirebaseDatabase {
     })
   }
   getUserData (key) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       let user = firebase.auth().currentUser
       let ref = _userDB.child(key)
       console.log('> FirebaseDatabase -> getUserData user.uid:', user.uid)
       console.log('> FirebaseDatabase -> getUserData key:', key)
       ref.once('value').then((value) => {
-        if (value != null) resolve(value.val())
+        console.log('> FirebaseDatabase -> getUserData value: ', value.val())
+        if (value.val() != null) resolve(value.val())
         else {
           let error = new Error()
           error.status = 404
-          throw error
+          reject(error)
         }
       })
     })
