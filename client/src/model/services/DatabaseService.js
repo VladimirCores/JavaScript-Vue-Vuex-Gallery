@@ -98,17 +98,16 @@ class DatabaseService {
   production () { PouchDB.debug.disable() }
   debug () { PouchDB.debug.enable('*') }
   // AUTHORIZATION
-  configureForUser (username, password) {
+  configureForUser (username) {
     console.log('===========================================================================')
-    console.log('> DatabaseService -> configureForUser: username = ' + username)
-    console.log('> DatabaseService -> configureForUser: password = ' + password)
+    console.log('> DatabaseService -> configureForUser')
     let promise = new Promise((resolve) => {
       _userDB = new PouchDB(DB_NAME_USER)
       _userDB.sync(new PouchDB(`${DB_URL}/${DB_NAME_USER}-${_convertToHex(username).toLowerCase()}`, {
-        // auth: {
-        //   username: username,
-        //   password: password
-        // },
+        fetch (url, opts) {
+          opts.credentials = 'include'
+          return PouchDB.fetch(url, opts)
+        },
         skip_setup: true
       }), {
         live: true,

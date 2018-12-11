@@ -11,7 +11,7 @@ import DatabaseService from '@/model/services/DatabaseService'
 class ConfigUserCommand {
   execute (userDoc) {
     console.log('> ConfigUserCommand > userDoc:', userDoc)
-    return DatabaseService.configureForUser(userDoc.name, userDoc.pass)
+    return DatabaseService.configureForUser(userDoc.name)
   }
 }
 

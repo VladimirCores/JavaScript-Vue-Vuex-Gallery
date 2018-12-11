@@ -14,7 +14,6 @@ class SignUpUserCommand {
     let db = DatabaseService.getApplicationInstance()
     let metadata = {
       email: name,
-      pass: password,
       firstName: firstName,
       lastName: lastName,
       logged: false
@@ -25,7 +24,7 @@ class SignUpUserCommand {
         // {ok: true, id: "org.couchdb.user:myname@gmail.com", rev: "5-2604e0329e2a2f5bd7c10677d0448d25"}
         console.log('> SignUpUserCommand > signUp: response =', response)
         if (response.ok) {
-          return { name: name, pass: password }
+          return { name: name, password: password }
         } else return UserError.SIGN_UP_RESPONSE
       })
       .catch((error) => {

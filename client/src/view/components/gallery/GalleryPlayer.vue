@@ -47,23 +47,15 @@ export default {
         transparent: false,
         color: 0x330000
       },
-      videoID: null,
       playerReady: false,
       playerWidth: 0,
       playerHeight: 0
     }
   },
-  watch: {
-    selectedItem () {
-      if (this.selectedItem) {
-        const uriParts = this.selectedItem.uri.split('/')
-        this.playerReady = false
-        this.videoID = uriParts[2]
-      } else this.videoID = null
-      return this.videoID
-    }
-  },
   computed: {
+    videoID () {
+      return this.selectedItem.uri.split('/')[2]
+    },
     height () {
       let result = ((window.innerWidth * 1080 / 1980)).toFixed(0)
       let heightLimit = window.innerHeight * 0.5

@@ -2,7 +2,6 @@ export default class UserVO {
   constructor () {
     this._id = ''
     this.name = ''
-    this.pass = ''
     this.derived_key = ''
     this.salt = ''
     this.lastName = ''

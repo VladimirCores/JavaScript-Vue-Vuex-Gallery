@@ -48,7 +48,7 @@ const UserStore = {
     },
     [UserAction.LOGIN]: (store, payload) => {
       console.log('> UserStore -> UserAction.LOGIN : payload', payload)
-      return LoginUserCommand.execute(payload.name, payload.pass).then((result) => {
+      return LoginUserCommand.execute(payload.name, payload.password).then((result) => {
         console.log('> UserStore -> UserAction.LOGIN : result =', result)
         if (Number.isInteger(result)) return result
         else return store.dispatch(UserAction.CONFIG, result)
