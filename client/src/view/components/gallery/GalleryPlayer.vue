@@ -2,11 +2,13 @@
   <div class="gallery-player">
     <VideoPlayer class="video-player" v-if="selectedItem"
      ref="player"
-     :video-id="videoURL"
+     :video-id="videoID"
      :player-width="playerWidth"
      :player-height="playerHeight"
      @ready="onReady"
      @loaded="onLoaded"
+     @texttrackchange="onTrackChanged"
+     @cuechange="onCueChanged"
     ></VideoPlayer>
     <div class="cover" v-bind:style="{ height: playerHeight + 'px' }"/>
     <AssetSpinner v-if="loading"></AssetSpinner>
@@ -19,6 +21,7 @@ import AssetSpinner from '@/view/components/_common/loading/AssetSpinner'
 
 const EVENT_LOADED = 'loaded'
 const EVENT_READY = 'ready'
+const EVENT_CUE = 'cue'
 
 export default {
   name: 'GalleryPlayer',
@@ -40,18 +43,25 @@ export default {
     return {
       options: {
         title: true,
-        autoplay: false,
         background: true,
         transparent: false,
         color: 0x330000
       },
+      videoID: null,
       playerReady: false,
       playerWidth: 0,
       playerHeight: 0
     }
   },
+  watch: {
+    selectedItem () {
+      const uriParts = this.selectedItem.uri.split('/')
+      this.playerReady = false
+      this.videoID = uriParts[2]
+      return this.videoID
+    }
+  },
   computed: {
-    videoURL () { return this.selectedItem.uri.split('/')[2] },
     height () {
       let result = ((window.innerWidth * 1080 / 1980)).toFixed(0)
       let heightLimit = window.innerHeight * 0.5
@@ -70,12 +80,19 @@ export default {
       this.playerWidth = this.width
       this.playerHeight = this.height
     },
+    onCueChanged () {
+      console.log('> GalleryPlayer -> ON CUE CHANGED')
+      this.$emit(EVENT_CUE)
+    },
+    onTrackChanged () {
+      console.log('> GalleryPlayer -> ON TRACK CHANGED')
+    },
     onLoaded () {
       console.log('> GalleryPlayer -> ON LOADED')
       this.$emit(EVENT_LOADED)
     },
     onReady () {
-      console.log('PLAYER READY')
+      console.log('> GalleryPlayer -> PLAYER READY')
       this.playerReady = true
       this.$emit(EVENT_READY)
     },

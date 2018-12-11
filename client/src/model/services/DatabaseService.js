@@ -1,6 +1,9 @@
 import PouchDB from 'pouchdb'
 import PouchAuth from 'pouchdb-authentication'
+import PouchDebug from 'pouchdb-debug'
+
 PouchDB.plugin(PouchAuth)
+PouchDB.plugin(PouchDebug)
 
 const DB_NAME_APP = 'application'
 const DB_NAME_USER = 'userdb'

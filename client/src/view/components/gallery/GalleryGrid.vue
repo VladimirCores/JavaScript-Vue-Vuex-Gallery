@@ -1,14 +1,14 @@
 <template>
   <div class="gallery-view" v-if="ready">
-    <GalleryViewItem
+    <GalleryGridItem
       v-for="item in items"
-      :imageUrl="item.imageUrl"
-      :key="item.uri"
-      :index="item.index"
-      :width="item.width"
-      :height="item.height"
-      :onSelected="OnGalleryItemSelected"
-      :isSelected="isItemSelected(item)"
+        :imageUrl="item.imageUrl"
+        :key="item.uri"
+        :index="item.index"
+        :width="item.width"
+        :height="item.height"
+        :onSelected="OnGalleryGridItemSelected"
+        :isSelected="isItemSelected(item)"
     />
   </div>
 </template>
@@ -16,7 +16,7 @@
 <script>
 
 import { createNamespacedHelpers } from 'vuex'
-import GalleryViewItem from '@/view/components/gallery/GalleryViewItem'
+import GalleryGridItem from '@/view/components/gallery/GalleryGridItem'
 import { GALLERY_STORE_NAME } from '@/consts/StoreNames'
 import {
   IS_GALLERY_READY,
@@ -31,14 +31,12 @@ export default
 {
   name: 'GalleryView',
   components: {
-    GalleryViewItem
+    GalleryGridItem
   },
   props: ['selectedItem'],
   methods: {
-    OnGalleryItemSelected (index) { this.$emit(EVENT_SELECT, index) },
-    isItemSelected (item) {
-      return this.selectedItem && this.selectedItem.index === item.index
-    }
+    OnGalleryGridItemSelected (index) { this.$emit(EVENT_SELECT, index) },
+    isItemSelected (item) { return this.selectedItem && this.selectedItem.index === item.index }
   },
   computed: {
     ...mapGetters({

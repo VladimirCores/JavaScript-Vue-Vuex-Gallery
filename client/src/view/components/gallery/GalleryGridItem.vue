@@ -4,8 +4,7 @@
       v-bind:class="{
         'gallery-view-item': true,
         'selected':isSelected
-      }"
-    >
+      }">
       <img :src="imageUrl"/>
     </div>
 </template>

@@ -8,20 +8,22 @@
     <GalleryPlayer
       :selectedItem="selectedItem"
       :loading="videoLoading"
-      @loaded="OnVideoLoaded"
-      @ready="OnVideoPlayerReady"
+      @loaded="OnGalleryPlayerLoaded"
+      @ready="OnGalleryPlayerReady"
+      @cue="OnGalleryPlayerCue"
     />
 
     <GalleryNavigation v-if="isGalleryReady" keep-alive
       :locked="loading"
-      @navigate="OnNavigateChanged"
+      @navigate="OnGalleryNavigationChanged"
     />
 
-    <GalleryView v-if="!loading" keep-alive
-       @select="OnGalleryItemSelected"
+    <GalleryGrid v-if="!loading" keep-alive
+       @select="OnGalleryGridItemSelected"
        :selectedItem="selectedItem"
     />
     <Spinner v-else></Spinner>
+
     <div class="icon_settings" @click="OnOpenUserSettingsForm"/>
   </div>
 </template>
@@ -42,7 +44,7 @@ import GalleryStore from '@/model/stores/GalleryStore'
 import GalleryAction from '@/consts/actions/GalleryAction'
 
 import Spinner from '@/view/components/_common/loading/Spinner.vue'
-import GalleryView from '@/view/components/gallery/GalleryView'
+import GalleryGrid from '@/view/components/gallery/GalleryGrid'
 import GalleryPlayer from '@/view/components/gallery/GalleryPlayer'
 import GalleryNavigation from '@/view/components/gallery/GalleryNavigation'
 
@@ -64,7 +66,7 @@ export default {
   name: 'GalleryPage',
   components: {
     Spinner,
-    GalleryView,
+    GalleryGrid,
     GalleryPlayer,
     GalleryNavigation
   },
@@ -73,17 +75,17 @@ export default {
     ...galleryMapGetters({ isGalleryReady: GalleryGetter.IS_GALLERY_READY })
   },
   methods: {
-    OnVideoPlayerReady () {
-      this.videoLoading = true
-    },
-    OnVideoLoaded () {
+    OnGalleryPlayerReady () {
       this.videoLoading = false
     },
-    OnGalleryItemSelected (index) {
+    OnGalleryPlayerCue () { this.videoLoading = false },
+    OnGalleryPlayerLoaded () { },
+    OnGalleryGridItemSelected (index) {
+      console.log('> GalleryPage -> OnGalleryGridItemSelected: index = ' + index)
       this.videoLoading = true
       this.actionSelectItem(index)
     },
-    OnNavigateChanged (direction) {
+    OnGalleryNavigationChanged (direction) {
       this.loading = true
       this.actionNavigateTo(direction).then((status) => {
         switch (status) {
@@ -111,7 +113,7 @@ export default {
             ShowErrorToast('SERVER REQUEST FAILED')
             break
         }
-        this.loading = !status
+        this.loading = false
       })
     }
   },
