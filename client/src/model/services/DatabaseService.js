@@ -102,14 +102,14 @@ class DatabaseService {
     console.log('===========================================================================')
     console.log('> DatabaseService -> configureForUser')
     let promise = new Promise((resolve) => {
-      _userDB = new PouchDB(DB_NAME_USER)
-      _userDB.sync(new PouchDB(`${DB_URL}/${DB_NAME_USER}-${_convertToHex(username).toLowerCase()}`, {
+      _userDB = new PouchDB(`${DB_URL}/${DB_NAME_USER}-${_convertToHex(username).toLowerCase()}`, {
         fetch (url, opts) {
           opts.credentials = 'include'
           return PouchDB.fetch(url, opts)
         },
         skip_setup: true
-      }), {
+      })
+      _userDB.sync(new PouchDB(DB_NAME_USER), {
         live: true,
         retry: true
       })
