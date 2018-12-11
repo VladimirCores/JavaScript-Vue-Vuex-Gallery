@@ -53,9 +53,11 @@ PouchDB.on('created', function (dbName) {
 
 class DatabaseService {
   init () {
-    console.log('> DatabaseService -> Init: ' + DB_NAME_APP)
+    console.log('> DatabaseService -> Init: DB name = ' + DB_NAME_APP)
     _applicationDB = new PouchDB(`${DB_URL}${DB_NAME_APP}`, {skip_setup: true})
+    console.log('> DatabaseService -> Init: _applicationDB.adapter = ' + _applicationDB.adapter)
     _applicationLocalDB = new PouchDB(DB_NAME_APP)
+    console.log('> DatabaseService -> Init: _applicationLocalDB.adapter = ' + _applicationLocalDB.adapter)
     _applicationLocalDB.sync(_applicationDB, {live: true, retry: true})
     _applicationLocalDB.changes({
       since: 'now',
@@ -103,10 +105,10 @@ class DatabaseService {
     let promise = new Promise((resolve) => {
       _userDB = new PouchDB(DB_NAME_USER)
       _userDB.sync(new PouchDB(`${DB_URL}/${DB_NAME_USER}-${_convertToHex(username).toLowerCase()}`, {
-        auth: {
-          username: username,
-          password: password
-        },
+        // auth: {
+        //   username: username,
+        //   password: password
+        // },
         skip_setup: true
       }), {
         live: true,
@@ -116,18 +118,6 @@ class DatabaseService {
           // handle change
           console.log('> DatabaseService -> userDB - change:', event)
           OnDatabaseEvent(DB_NAME_USER, EVENT_DB_CHANGE, event.change)
-          // let change = event.change
-          // if (change.ok) {
-          //   let docs = change.docs
-          //   let interestsMap = _callbacks[EVENT_DB_CHANGE].get(DB_NAME_USER)
-          //   docs.forEach(doc => {
-          //     let interestID = doc._id
-          //     if (interestsMap.has(interestID)) {
-          //       let callbacks = interestsMap.get(interestID)
-          //       callbacks.forEach(callback => callback(doc))
-          //     }
-          //   })
-          // }
         })
         .on('paused', (err) => {
           // replication paused (e.g. replication up to date, user went offline)
@@ -152,13 +142,13 @@ class DatabaseService {
       _userDB.info().then(resolve)
     })
     console.log('> DatabaseService -> USER_DB: _userDB.name = ' + _userDB.name)
-    console.log('===========================================================================')
+    console.log('===============================================================')
     return promise
   }
   isAuthorized () {
     return _applicationDB.getSession()
       .then((response) => {
-        console.log('> DatabaseService -> getSession:', response)
+        console.log('> DatabaseService -> isAuthorized -> getSession:', response)
         return response ? response.userCtx.name : null // response.userCtx.name is the current user
       })
   }

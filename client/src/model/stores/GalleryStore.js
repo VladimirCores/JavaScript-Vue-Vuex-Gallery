@@ -8,7 +8,8 @@ import GetDataGalleryCommand from '@/controller/commands/gallery/GetGalleryDataC
 import NavigateGalleryCommand from '@/controller/commands/gallery/NavigateGalleryCommand'
 
 import {
-  GALLERY_STORE_NAME, USER_SETTINGS_STORE_NAME
+  GALLERY_STORE_NAME,
+  USER_SETTINGS_STORE_NAME
 } from '@/consts/StoreNames'
 
 import DatabaseService, {Event as DatabaseEvent} from '@/model/services/DatabaseService'
@@ -25,10 +26,12 @@ export default {
   namespaced: true,
   onRegister (store) {
     console.log('> GalleryStore -> onRegister')
-    changeListenerID = DatabaseService.addUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, (doc) => {
-      console.log('> GalleryStore -> DatabaseEvent.CHANGE:', doc)
-      store.dispatch(GalleryAction.SETUP_GALLERY_VIEW)
-    })
+    changeListenerID = DatabaseService.addUserEventListener(
+      DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, (doc) => {
+        console.log('> GalleryStore -> DatabaseEvent.CHANGE:', doc)
+        store.dispatch(GalleryAction.SETUP_GALLERY_VIEW)
+      }
+    )
   },
   onRemove (store) {
     console.log('> GalleryStore -> onRemove')

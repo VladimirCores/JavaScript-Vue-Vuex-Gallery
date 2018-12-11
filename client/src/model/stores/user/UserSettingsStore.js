@@ -22,10 +22,12 @@ const UserSettingsStore = {
   namespaced: false,
   onRegister (store) {
     console.log('> UserSettingsStore -> onRegister')
-    changeListenerID = DatabaseService.addUserEventListener(DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, (doc) => {
-      console.log('> UserSettingsStore -> DatabaseEvent.CHANGE:', doc, store)
-      store.commit(UserSettingsMutation.SETUP_SETTINGS, doc)
-    })
+    changeListenerID = DatabaseService.addUserEventListener(
+      DatabaseEvent.CHANGE, USER_SETTINGS_STORE_NAME, (doc) => {
+        console.log('> UserSettingsStore -> DatabaseEvent.CHANGE:', doc, store)
+        store.commit(UserSettingsMutation.SETUP_SETTINGS, doc)
+      }
+    )
   },
   onRemove (store) {
     console.log('> UserSettingsStore -> onRemove')

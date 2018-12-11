@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "vimeo-likes-gallery-firebase",
+    "staging": "vimeo-likes-gallery-firebase"
+  }
+}

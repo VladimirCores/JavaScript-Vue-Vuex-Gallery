@@ -13,7 +13,7 @@ import UserAction from '@/consts/actions/UserAction'
 
 Vue.use(VueToasted)
 Vue.config.productionTip = false
-DatabaseService.init().debug()
+DatabaseService.init().production()
 
 const store = App.store
 

@@ -55,9 +55,11 @@ export default {
   },
   watch: {
     selectedItem () {
-      const uriParts = this.selectedItem.uri.split('/')
-      this.playerReady = false
-      this.videoID = uriParts[2]
+      if (this.selectedItem) {
+        const uriParts = this.selectedItem.uri.split('/')
+        this.playerReady = false
+        this.videoID = uriParts[2]
+      } else this.videoID = null
       return this.videoID
     }
   },

@@ -1,7 +1,5 @@
 import DatabaseService from '@/model/services/DatabaseService'
 
-// import UserError from '@/consts/errors/UserError'
-
 /**
   return
     SUCCESS:
@@ -13,7 +11,7 @@ import DatabaseService from '@/model/services/DatabaseService'
 class ConfigUserCommand {
   execute (userDoc) {
     console.log('> ConfigUserCommand > userDoc:', userDoc)
-    return DatabaseService.configureForUser(userDoc.name, userDoc.password_scheme)
+    return DatabaseService.configureForUser(userDoc.name, userDoc.pass)
   }
 }
 

@@ -44,8 +44,8 @@ export default new Vuex.Store({
         let moduleDTO = new ModuleDTO(module.default)
         store.dispatch(ApplicationAction.REGISTER_MODULE, moduleDTO)
         if (payload && payload instanceof AuthDTO) {
-          return store.dispatch(USER_STORE_NAME + '/' + payload.action, payload.data).then((result) => {
-            if (Number.isInteger(result)) store.dispatch(ApplicationAction.DEREGISTER_MODULE, moduleDTO.module)
+          return store.dispatch(`${USER_STORE_NAME}/${payload.action}`, payload.data).then((result) => {
+            if (Number.isInteger(result)) store.dispatch(ApplicationAction.UNREGISTER_MODULE, moduleDTO.module)
             else store.commit(SET_USER_LOGGED, true)
             return result
           })
@@ -54,12 +54,12 @@ export default new Vuex.Store({
         }
       })
     },
-    [ApplicationAction.DEREGISTER_MODULE] (store, payload) {
+    [ApplicationAction.UNREGISTER_MODULE] (store, payload) {
       let moduleName = payload.name
       let module = this._modules.root.getChild(moduleName)
       let moduleContext = module.context
       registeredModules.splice(registeredModules.indexOf(payload), 1)
-      console.log('> ApplicationStore -> ApplicationAction.DEREGISTER_MODULE payload =', module)
+      console.log('> ApplicationStore -> ApplicationAction.UNREGISTER_MODULE payload =', module)
       payload.onRemove && payload.onRemove(moduleContext)
       this.unregisterModule(moduleName)
       this.commit(DESTROY_MODULE, moduleName)
@@ -88,7 +88,7 @@ export default new Vuex.Store({
         while (counter--) {
           let module = registeredModules[counter]
           console.log('> ApplicationStore -> ApplicationAction.EXIT unregisterModule =', module)
-          store.dispatch(ApplicationAction.DEREGISTER_MODULE, module)
+          store.dispatch(ApplicationAction.UNREGISTER_MODULE, module)
         }
       })
     }

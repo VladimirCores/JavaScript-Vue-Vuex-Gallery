@@ -122,7 +122,7 @@ export default {
     this.$store.dispatch(ApplicationAction.REGISTER_MODULE, new ModuleDTO(GalleryStore))
   },
   beforeDestroy () {
-    this.$store.dispatch(ApplicationAction.DEREGISTER_MODULE, GalleryStore)
+    this.$store.dispatch(ApplicationAction.UNREGISTER_MODULE, GalleryStore)
   },
   created () { this.setup() },
   data () {
