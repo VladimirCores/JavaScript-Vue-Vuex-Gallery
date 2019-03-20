@@ -12,6 +12,7 @@ import ApplicationError from '@/consts/errors/ApplicationError'
 import ApplicationAction from '@/consts/actions/ApplicationAction'
 import ApplicationGetter from '@/consts/getters/ApplicationGetter'
 
+import SetupApplicationCommand from '@/controller/commands/application/SetupApplicationCommand'
 import LoadImageUtilsCommand from '@/controller/commands/utils/LoadImageUtilsCommand'
 
 import AuthDTO from '@/model/dtos/AuthDTO'
@@ -37,6 +38,21 @@ export default new Vuex.Store({
   state: new ApplicationVO(),
   strict: process.env.NODE_ENV !== 'production',
   actions: {
+    [ApplicationAction.SETUP_APPLICATION] (store) {
+      return SetupApplicationCommand.execute().then((data) => {
+        console.log('> ApplicationStore -> ApplicationAction.SETUP_APPLICATION userDoc =', data.user)
+        console.log('> ApplicationStore -> ApplicationAction.SETUP_APPLICATION serverDoc =', data.server)
+        if (data.user) {
+          store.dispatch(ApplicationAction.SETUP_USER, new AuthDTO(data.user, UserAction.CONFIG))
+        }
+        store.dispatch(ApplicationAction.SETUP_SERVER, data.server)
+      }).then(() => {
+        console.log('> ApplicationStore -> ApplicationAction.SETUP_APPLICATION: Application Initialized')
+        store.dispatch(ApplicationAction.INITIALIZED)
+      }).catch((error) => {
+        console.log('> ApplicationStore -> ApplicationAction.SETUP_APPLICATION:', error)
+      })
+    },
     [ApplicationAction.SETUP_SERVER] (store, payload) { store.commit(SERVER_DATA_SETUP, payload) },
     [ApplicationAction.SETUP_USER] (store, payload) {
       console.log('> ApplicationStore -> ApplicationAction.SETUP_USER payload =', payload)

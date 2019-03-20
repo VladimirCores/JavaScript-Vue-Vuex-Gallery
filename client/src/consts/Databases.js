@@ -1,5 +1,5 @@
-export const SETTINGS = 'settings'
+export const SERVER = 'server'
 
 export default {
-  SETTINGS
+  SERVER
 }
