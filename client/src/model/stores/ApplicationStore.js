@@ -92,7 +92,8 @@ export default new Vuex.Store({
     },
     [ApplicationAction.LOAD_IMAGE] (store, payload) {
       if (payload && payload instanceof LoadImageDTO) {
-        return LoadImageUtilsCommand.execute(payload.url, payload.onprogress)
+        let url = `${store.state.server.imageAPI}/${Math.floor(payload.height * 1.77)}x${payload.height}`
+        return LoadImageUtilsCommand.execute(url, payload.onprogress)
       }
     },
     [ApplicationAction.INITIALIZED] (store) { store.commit(SET_APPLICATION_IS_READY, true) },

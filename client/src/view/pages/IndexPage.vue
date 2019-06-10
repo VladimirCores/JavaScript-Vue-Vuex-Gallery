@@ -1,12 +1,12 @@
 <template>
-  <div class="index-page" ref="ref_background" :style="{ 'width': width + 'px', 'height': height + 'px'}">
+  <div class="index-page" ref="background" :style="{ 'width': width + 'px', 'height': height + 'px'}">
     <AssetSpinner v-if="loading"/>
   </div>
 </template>
 
 <script>
 
-import { mapState, mapActions } from 'vuex'
+import { mapActions } from 'vuex'
 import ApplicationAction from '@/consts/actions/ApplicationAction'
 import LoadImageDTO from '@/model/dtos/LoadImageDTO'
 import AssetSpinner from '@/view/components/_common/loading/AssetSpinner'
@@ -16,18 +16,12 @@ export default {
   components: {
     AssetSpinner
   },
-  computed: {
-    ...mapState([
-      'server'
-    ])
-  },
   mounted () {
-    let url = `${this.server.imageAPI}/${Math.floor(this.height * 1.77)}x${this.height}`
-    this.loadImage(new LoadImageDTO(url, (progress) => {
-      console.log(progress)
+    this.loadImage(new LoadImageDTO(this.height, this.height, (progress) => {
+      console.log('> HomePage -> background image loading progress: ' + progress)
     })).then((imageURL) => {
       if (imageURL) {
-        let back = this.$refs.ref_background
+        let back = this.$refs.background
         back && (back.style.backgroundImage = `url(${imageURL})`)
       }
       this.loading = false

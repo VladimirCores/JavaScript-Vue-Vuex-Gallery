@@ -39,9 +39,6 @@ class LoadImageUtilsCommand {
         if (!xhr.status.toString().match(/^2/)) {
           reject(xhr)
         } else {
-          if (!notifiedNotComputable && onprogress) {
-            onprogress(100)
-          }
           let blob = new Blob([this.response])
           resolve(window.URL.createObjectURL(blob))
         }

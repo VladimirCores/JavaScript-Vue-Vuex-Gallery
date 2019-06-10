@@ -35,7 +35,7 @@ const UserSettingsStore = {
   },
   actions: {
     [UserSettingsAction.CONFIG]: (store, payload) => {
-      console.log('> UserSettingsStore -> UserSettingsAction.LOGIN : payload =', payload)
+      console.log('> UserSettingsStore -> UserSettingsAction.CONFIG : payload =', payload)
       GetSettingsUserCommand.execute(store.state).then((result) => {
         store.commit(UserSettingsMutation.SETUP_SETTINGS, result)
       })
