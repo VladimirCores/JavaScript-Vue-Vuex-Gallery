@@ -2,7 +2,13 @@
 
 > A Vue.js project
 
-You have to have an access token from Vimeo Developers site: https://developer.vimeo.com/
+1. Install and run CouchDB: https://couchdb.apache.org/
+2. Create database "application" in Fauxton and add "settings" document to it:
+{
+  "url": "https://api.vimeo.com/users",
+  "imageAPI": "https://source.unsplash.com"
+}
+3. You have to have an access token from Vimeo Developers site: https://developer.vimeo.com/
 And then add the token in the app settings (click gear in the left bottom corner)
 
 ## Build Setup
