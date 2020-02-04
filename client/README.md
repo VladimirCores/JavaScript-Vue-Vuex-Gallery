@@ -2,6 +2,9 @@
 
 > A Vue.js project
 
+You have to have an access token from Vimeo Developers site: https://developer.vimeo.com/
+And then add the token in the app settings (click gear in the left bottom corner)
+
 ## Build Setup
 
 ``` bash
