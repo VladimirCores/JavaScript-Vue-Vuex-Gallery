@@ -13,7 +13,7 @@
     "test": "npm run unit && npm run e2e"
   },
   "dependencies": {
-    "axios": "^0.17.1",
+    "axios": "^0.21.1",
     "pouchdb": "^7.0.0",
     "pouchdb-adapter-idb": "^7.0.0",
     "pouchdb-authentication": "^1.1.3",
